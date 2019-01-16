@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Reproducibility, Workflow, Version Control"
-author: "Student Name"
+author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -30,22 +30,22 @@ The completed exercise is due on Thursday, 17 January, 2018 before class begins.
 ### Question
 Why are reproducible practices becoming the norm in data analytics?
 
-> Answer: 
+> Answer: I think that reproducible practices are becoming the norm in data analytics because it allows anyone to reproduce exactly the results of a data analytics study, which is extremely important for the validation and review of these studies; moreover, it allows different groups of people to collaborate in a efficient, clear, and open way, and where you can always go back and try to fix things that went wrong along the way.
 
 ### Question
 What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: I studied hydrology in undergrad and later in my career as a hydraulic engineer I worked using hydrologic data like precipitation, river flow, evaporation, etc., to determine return periods, frequencies, probability distributions, an use that data for designing infrastructure and/or making management decisions. I have also managed large data sets of geographic information like deep wells locations and characteristic using GIS software. My only experience using R was doing the course ENV 710 Applied Data Analysis for Environmental Sciences last semester. I have no experience with Git.
 
 ### Question
 Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: I feel confident learning R and others programing languages. Logical systems are my comfort zone. Also, having experience managing some environmental data sets in the past (not extremely large) makes that part of the course familiar.
 
 ### Question
 Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer: Nothing makes me feel super apprehensive, but I am always a little scared of exploring new areas like new software, new ways of working, or statistical methods and approaches. It is a good scare though, mixed with excitement of learning new things. I hope the assignments will not be super time demanding. 
 
 
 ## 2) GitHub
@@ -53,6 +53,6 @@ Are there any components of the course about which you feel apprehensive?
 ### Your Repository
 Provide a link below to your course repository in GitHub. Make sure you have pulled all recent changes from the course repository (https://github.com/KateriSalk/Environmental_Data_Analytics) and that you have updated your course README file. 
 
-> Answer: 
+> Answer: https://github.com/fr55/Environmental_Data_Analytics.git
 
 
