@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2: Coding Basics"
-author: "Student Name"
+author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -29,9 +29,23 @@ The completed exercise is due on Thursday, 24 January, 2019 before class begins.
 
 1. Generate a sequence of numbers from one to 100, increasing by fours. Assign this sequence a name. 
 
+```{r}
+hundred_sequence_byfour <- seq(1, 100, 4) # from, to, by
+hundred_sequence_byfour # printing the result
+```
+
 2. Compute the mean and median of this sequence. 
+```{r}
+mean_sequ <- mean(hundred_sequence_byfour) # computing the mean and asigning it to an object
+mean_sequ # printing the mean
+median_sequ <- median(hundred_sequence_byfour) # computing the median and asigning it to an object
+median_sequ # printing the median
+```
 
 3. Ask R to determine whether the mean is greater than the median. 
+```{r}
+mean_sequ > median_sequ # conditional statement
+```
 
 4. Insert comments in your code to describe what you are doing.
 
