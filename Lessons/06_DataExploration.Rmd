@@ -8,7 +8,6 @@ fig_width: 5
 fig_height: 2.5
 editor_options: 
   chunk_output_type: console
-
 ---
 
 ## LESSON OBJECTIVES
@@ -46,11 +45,11 @@ colnames(USGS.flow.data) <- c("agency_cd", "site_no", "datetime",
                               "gage.height.max", "gage.height.max.approval", 
                               "gage.height.min", "gage.height.min.approval", 
                               "gage.height.mean", "gage.height.mean.approval")
-str(USGS.flow.data)
-dim(USGS.flow.data)
+str(USGS.flow.data) #structure
+dim(USGS.flow.data) #dimension
 
-#head(USGS.flow.data)
-class(USGS.flow.data$datetime)
+#head(USGS.flow.data) # not useful for kniting it
+class(USGS.flow.data$datetime) # it is a factor. Problem. Formating dates
 
 ```
 
@@ -82,9 +81,9 @@ help(as.Date)
 # (code must be uncommented)
 today <- Sys.Date()
 format(today, format = "%B")
-#format(today, format = "")
-#format(today, format = "")
-#format(today, format = "")
+format(today, format = "%d-%m-%Y")
+format(today, format = "%a")
+format(today-1, format = "%A %d de %B de %Y")
 
 USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y") 
 ```
