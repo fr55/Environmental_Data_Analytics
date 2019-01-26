@@ -3,6 +3,8 @@ title: "Assignment 3: Data Exploration"
 author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -28,11 +30,6 @@ The completed exercise is due on Thursday, 31 January, 2019 before class begins.
 ## 1) Set up your R session
 
 Check your working directory, load necessary packages (tidyverse), and upload the North Temperate Lakes long term monitoring dataset for the light, temperature, and oxygen data for three lakes (file name: NTL-LTER_Lake_ChemistryPhysics_Raw.csv). Type your code into the R chunk below.
-```{r}
-setwd("C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics")
-```
-
-
 
 ```{r}
 # working directory should be the parent folder for the Environmental Data Analytics Course
@@ -42,14 +39,13 @@ setwd("C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EO
 library(tidyverse)
 # Relative file path (friendly for users regardless of machine)
 NTL_LTER_Lake.data <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
-USGS.flow.data <- read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv")
 ```
 
 ## 2) Learn about your system
 
 Read about your dataset in the NTL-LTER README file. What are three salient pieces of information you gained from reading this file?
 
-> ANSWER: 1- What are the data contained in the file. 2- Where were the data collected 3- How were the data collected
+> ANSWER: 1- What are the data contained in the file. 2- Where were the data collected 3- How were the data collected. Also you know where to reach out in case of doubts.
 
 ## 3) Obtain basic summaries of your data
 
@@ -63,27 +59,33 @@ Write R commands to display the following information:
 
 ```{r}
 # 1
-
+dim(NTL_LTER_Lake.data)
 # 2
-
+class(NTL_LTER_Lake.data)
 # 3
-
+head(NTL_LTER_Lake.data, 8)
 # 4
-
+class(NTL_LTER_Lake.data$lakename)
+class(NTL_LTER_Lake.data$sampledate)
+class(NTL_LTER_Lake.data$depth)
+class(NTL_LTER_Lake.data$temperature_C)
 # 5
-
+summary(NTL_LTER_Lake.data$lakename)
+summary(NTL_LTER_Lake.data$depth)
+summary(NTL_LTER_Lake.data$temperature_C)
 ```
 
 Change sampledate to class = date. After doing this, write an R command to display that the class of sammpledate is indeed date. Write another R command to show the first 10 rows of the date column. 
 
 ```{r}
-
+NTL_LTER_Lake.data$sampledate <- as.Date(NTL_LTER_Lake.data$sampledate, format = "%m/%d/%y") 
+class(NTL_LTER_Lake.data$sampledate)
+head(NTL_LTER_Lake.data$sampledate, 10)
 ```
 
 Question: Do you want to remove NAs from this dataset? Why or why not?
 
-> ANSWER: 
-
+> ANSWER: We do not know yet the research question so we do not know if we want to remove NAs from this dataset
 
 ## 4) Explore your data graphically
 
@@ -97,13 +99,17 @@ Write R commands to display graphs depicting:
 6. Boxplot of temperature based on depth, with depth divided into 0.25 m increments
 7. Scatterplot of temperature by depth
 
-```{r}
+```{r, fig.height = 3, fig.width = 4}
 # 1
-
+NTL_LTER_Lake.data.complete <- na.omit(NTL_LTER_Lake.data)
+ggplot(NTL_LTER_Lake.data.complete, aes(x = temperature_C)) +
+  geom_bar()
 # 2
-
+ggplot(NTL_LTER_Lake.data.complete) +
+  geom_histogram(aes(x = temperature_C), binwidth = 2)
 # 3
-
+ggplot(NTL_LTER_Lake.data.complete) +
+  geom_histogram(aes(x = temperature_C), binwidth = 0.5)
 # 4
 
 # 5
