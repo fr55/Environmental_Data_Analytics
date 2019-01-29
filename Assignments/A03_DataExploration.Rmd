@@ -101,7 +101,7 @@ Write R commands to display graphs depicting:
 
 ```{r, fig.height = 3, fig.width = 4}
 # 1
-NTL_LTER_Lake.data.complete <- na.omit(NTL_LTER_Lake.data)
+NTL_LTER_Lake.data.complete <- na.omit(NTL_LTER_Lake.data) #I´m assuming an NA Temperature doesnt give us useful information.
 ggplot(NTL_LTER_Lake.data.complete, aes(x = temperature_C)) +
   geom_bar()
 # 2
@@ -111,7 +111,10 @@ ggplot(NTL_LTER_Lake.data.complete) +
 ggplot(NTL_LTER_Lake.data.complete) +
   geom_histogram(aes(x = temperature_C), binwidth = 0.5)
 # 4
-
+ggplot(NTL_LTER_Lake.data.complete) + #WORKING IN THIS CODE
+  geom_freqpoly(aes(x = gage.height.mean, color = gage.height.mean.approval), bins = 50) +
+  scale_x_continuous(limits = c(0, 10)) +
+  theme(legend.position = "top")
 # 5
 
 # 6
