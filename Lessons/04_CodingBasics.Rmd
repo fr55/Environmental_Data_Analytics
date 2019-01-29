@@ -200,7 +200,7 @@ recipe4 <- function(x) {
     x/2
   }
 }
-
+# if else can be used with vectors
 recipe5 <- function(x) {
   if(x < 3) {
     x*2
