@@ -75,7 +75,7 @@ summary(NTL_LTER_Lake.data$depth)
 summary(NTL_LTER_Lake.data$temperature_C)
 ```
 
-Change sampledate to class = date. After doing this, write an R command to display that the class of sammpledate is indeed date. Write another R command to show the first 10 rows of the date column. 
+Change sampledate to class = date. After doing this, write an R command to display that the class of sampledate is indeed date. Write another R command to show the first 10 rows of the date column. 
 
 ```{r}
 NTL_LTER_Lake.data$sampledate <- as.Date(NTL_LTER_Lake.data$sampledate, format = "%m/%d/%y") 
@@ -85,7 +85,9 @@ head(NTL_LTER_Lake.data$sampledate, 10)
 
 Question: Do you want to remove NAs from this dataset? Why or why not?
 
-> ANSWER: We do not know yet the research question so we do not know if we want to remove NAs from this dataset
+> ANSWER: We do not know yet the research question so we do not know if we want to remove NAs from this dataset.
+> also we need to be careful because there is a comment column with mostly NA values, which doesn't mean that the
+> row is invalid.
 
 ## 4) Explore your data graphically
 
@@ -99,9 +101,13 @@ Write R commands to display graphs depicting:
 6. Boxplot of temperature based on depth, with depth divided into 0.25 m increments
 7. Scatterplot of temperature by depth
 
-```{r, fig.height = 3, fig.width = 4}
+```{r, fig.height = 3.3, fig.width = 4}
 # 1
-NTL_LTER_Lake.data.complete <- na.omit(NTL_LTER_Lake.data) #I´m assuming an NA Temperature doesnt give us useful information.
+# Rows with Temperature NAs are removed because in a temperature variable NAs are not useful.
+# Only rows with NAs in temperature where deleted.
+
+NTL_LTER_Lake.data.complete <- subset(NTL_LTER_Lake.data, !is.na(temperature_C))  
+
 ggplot(NTL_LTER_Lake.data.complete, aes(x = temperature_C)) +
   geom_bar()
 # 2
@@ -110,28 +116,40 @@ ggplot(NTL_LTER_Lake.data.complete) +
 # 3
 ggplot(NTL_LTER_Lake.data.complete) +
   geom_histogram(aes(x = temperature_C), binwidth = 0.5)
+```
+
+```{r, fig.height = 4.5, fig.width = 9.5}
 # 4
-ggplot(NTL_LTER_Lake.data.complete) + #WORKING IN THIS CODE
-  geom_freqpoly(aes(x = gage.height.mean, color = gage.height.mean.approval), bins = 50) +
-  scale_x_continuous(limits = c(0, 10)) +
+ggplot(NTL_LTER_Lake.data.complete) + 
+  geom_freqpoly(aes(x = temperature_C, color = lakename), binwidth = 0.3) +
   theme(legend.position = "top")
+```
+
+```{r, fig.height = 3.5, fig.width = 9.5}
 # 5
+ggplot(NTL_LTER_Lake.data.complete) +
+  geom_boxplot(aes(x = lakename, y = temperature_C))
 
+```
+
+```{r, fig.height = 3.1, fig.width = 8}
 # 6
-
+ggplot(NTL_LTER_Lake.data.complete) +
+  geom_boxplot(aes(x = depth, y = temperature_C, group = cut_width(depth, 0.25)))
 # 7 
-
+ggplot(NTL_LTER_Lake.data.complete) +
+  geom_point(aes(x = depth, y = temperature_C))
 ```
 ## 5) Form questions for further data analysis
 
 What did you find out about your data from the basic summaries and graphs you made? Describe in 4-6 sentences.
 
-> ANSWER: 
+> ANSWER: I found out the variables in the data set, the name of the lakes involved in the study, the statistics of the variables depth and temperature. Also the bar chart, histogram, frequency polygons, and the first boxplot showed me the frequency and range of temperature values globally and for each lake. Finally the boxplot and scatterplot using temperature and depth showed me the relationship between depth and temperature. Temperatures tend to decrease with depth.
 
 What are 3 further questions you might ask as you move forward with  analysis of this dataset?
 
-> ANSWER 1: 
+> ANSWER 1: What is the relationship between the other variables in the data set?
 
-> ANSWER 2: 
+> ANSWER 2: Does the relationship between Temperature and Depth the same in each lake?
 
-> ANSWER 3: 
+> ANSWER 3: How strong is the relationship between Temperature and Depth implied by the scatterplot and the boxplot?
