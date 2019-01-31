@@ -101,15 +101,17 @@ Write R commands to display graphs depicting:
 6. Boxplot of temperature based on depth, with depth divided into 0.25 m increments
 7. Scatterplot of temperature by depth
 
-```{r, fig.height = 3.3, fig.width = 4}
+```{r, fig.height = 3, fig.width = 8}
 # 1
 # Rows with Temperature NAs are removed because in a temperature variable NAs are not useful.
 # Only rows with NAs in temperature where deleted.
 
 NTL_LTER_Lake.data.complete <- subset(NTL_LTER_Lake.data, !is.na(temperature_C))  
 
-ggplot(NTL_LTER_Lake.data.complete, aes(x = temperature_C)) +
+ggplot(NTL_LTER_Lake.data.complete, aes(x = temperature_C, color = lakename)) +
   geom_bar()
+```
+```{r, fig.height = 3.3, fig.width = 4}
 # 2
 ggplot(NTL_LTER_Lake.data.complete) +
   geom_histogram(aes(x = temperature_C), binwidth = 2)
