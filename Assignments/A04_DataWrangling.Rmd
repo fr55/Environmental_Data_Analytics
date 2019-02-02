@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -30,12 +30,40 @@ The completed exercise is due on Thursday, 7 February, 2019 before class begins.
 ## Set up your session 
 1. Check your working directory, load the `tidyverse` package, and upload all four raw data files associated with the EPA Air dataset. See the README file for the EPA air datasets for more information (especially if you have not worked with air quality data previously). 
 
+```{r}
+getwd() # working directory should be the parent folder for the Environmental Data Analytics Course
+library(tidyverse)
+EPA.air.O3.NC2017.data <- read.csv("./Data/Raw/EPAair_O3_NC2017_Raw.csv")
+EPA.air.O3.NC2018.data <- read.csv("./Data/Raw/EPAair_O3_NC2018_Raw.csv")
+EPA.air.PM25.NC2017.data <- read.csv("./Data/Raw/EPAair_PM25_NC2017_Raw.csv")
+EPA.air.PM25.NC2018.data <- read.csv("./Data/Raw/EPAair_PM25_NC2018_Raw.csv")
+```
+
+
 2. Generate a few lines of code to get to know your datasets (basic data summaries, etc.).
 
 ```{r}
 #1
+head(EPA.air.O3.NC2017.data)
+colnames(EPA.air.O3.NC2017.data)
+summary(EPA.air.O3.NC2017.data)
+dim(EPA.air.O3.NC2017.data)
+
+head(EPA.air.O3.NC2018.data)
+colnames(EPA.air.O3.NC2018.data)
+summary(EPA.air.O3.NC2018.data)
+dim(EPA.air.O3.NC2018.data)
 
 #2
+head(EPA.air.PM25.NC2017.data)
+colnames(EPA.air.PM25.NC2017.data)
+summary(EPA.air.PM25.NC2017.data)
+dim(EPA.air.PM25.NC2017.data)
+
+head(EPA.air.PM25.NC2018.data)
+colnames(EPA.air.PM25.NC2018.data)
+summary(EPA.air.PM25.NC2018.data)
+dim(EPA.air.PM25.NC2018.data)
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -46,12 +74,35 @@ The completed exercise is due on Thursday, 7 February, 2019 before class begins.
 
 ```{r}
 #3
+class(EPA.air.O3.NC2017.data$Date)
+class(EPA.air.O3.NC2018.data$Date)
+class(EPA.air.PM25.NC2017.data$Date)
+class(EPA.air.PM25.NC2018.data$Date)
 
+EPA.air.O3.NC2017.data$Date <- as.Date(EPA.air.O3.NC2017.data$Date, format = "%m/%d/%y")
+EPA.air.O3.NC2018.data$Date <- as.Date(EPA.air.O3.NC2018.data$Date, format = "%m/%d/%y")
+EPA.air.PM25.NC2017.data$Date <- as.Date(EPA.air.PM25.NC2017.data$Date, format = "%m/%d/%y")
+EPA.air.PM25.NC2018.data$Date <- as.Date(EPA.air.PM25.NC2018.data$Date, format = "%m/%d/%y")
 #4
 
+EPA.air.O3.NC2017.data.AQI <- select(EPA.air.O3.NC2017.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.O3.NC2018.data.AQI <- select(EPA.air.O3.NC2018.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.PM25.NC2017.data.AQI <- select(EPA.air.PM25.NC2017.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.PM25.NC2018.data.AQI <- select(EPA.air.PM25.NC2018.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+
 #5
+EPA.air.PM25.NC2017.data.AQI$AQS_PARAMETER_DESC <- "PM25"
+EPA.air.PM25.NC2018.data.AQI$AQS_PARAMETER_DESC <- "PM25"
 
 #6
+write.csv(EPA.air.O3.NC2017.data.AQI, row.names = FALSE, file =    
+"./Data/Processed/EPAair_O3_NC2017_AQI_Processed.csv")
+write.csv(EPA.air.O3.NC2018.data.AQI, row.names = FALSE, file =    
+"./Data/Processed/EPAair_O3_NC2018_AQI_Processed.csv")
+write.csv(EPA.air.PM25.NC2017.data.AQI, row.names = FALSE, file =    
+"./Data/Processed/EPAair_PM25_NC2017_AQI_Processed.csv")
+write.csv(EPA.air.PM25.NC2018.data.AQI, row.names = FALSE, file =    
+"./Data/Processed/EPAair_PM25_NC2018_AQI_Processed.csv")
 
 ```
 
