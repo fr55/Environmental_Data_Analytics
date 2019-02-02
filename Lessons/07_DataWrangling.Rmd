@@ -86,6 +86,8 @@ head(NTL.phys.data.surface2)
 dim(NTL.phys.data.surface2)
 head(NTL.phys.data.surface3)
 dim(NTL.phys.data.surface3)
+# MAtrix keep the row number. dplyr changes the row numbers
+
 
 # Choose multiple conditions to filter
 summary(NTL.phys.data$lakename)
@@ -95,27 +97,30 @@ NTL.phys.data.PeterPaul2 <- filter(NTL.phys.data, lakename != "Central Long Lake
                                      lakename != "Hummingbird Lake" & lakename != "Tuesday Lake" &
                                      lakename != "Ward Lake" & lakename != "West Long Lake")
 NTL.phys.data.PeterPaul3 <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake"))
+# %in% means include.
+
 
 # Choose a range of conditions of a numeric or integer variable
 summary(NTL.phys.data$daynum)
 NTL.phys.data.JunethruOctober1 <- filter(NTL.phys.data, daynum > 151 & daynum < 305)
-NTL.phys.data.JunethruOctober2 <- filter(NTL.phys.data, daynum > 151, daynum < 305)
+NTL.phys.data.JunethruOctober2 <- filter(NTL.phys.data, daynum > 151, daynum < 305) # , is equal to and
 NTL.phys.data.JunethruOctober3 <- filter(NTL.phys.data, daynum >= 152 & daynum <= 304)
-NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304))
+NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304)) # 152 and 304 are included
 
 # Exercise: 
 # filter NTL.phys.data for the year 1999
-# what code do you need to use, based on the class of the variable?
+NTL.phys.data.1999 <- filter(NTL.phys.data, year4 == 1999)
+# what code do you need to use, based on the class of the variable? Factor "", numbers alone
 class(NTL.phys.data$year4)
 
 # Exercise: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
-
+NTL.phys.data.19901999 <- filter(NTL.phys.data, lakename == "Tuesday Lake", year4 %in% c(1990:1999))
 
 ```
 Question: Why don't we filter using row numbers?
 
-> ANSWER: 
+> ANSWER: Not reprodusable. Not very efficient. You have to look what you want to do. MAybe in an actualization of the raw data the rows change.
 
 ### Arrange
 
@@ -127,16 +132,19 @@ NTL.phys.data.depth.descending <- arrange(NTL.phys.data, desc(depth))
 
 # Exercise: 
 # Arrange NTL.phys.data by temperature, in descending order. 
+NTL.phys.data.temperature.descending <- arrange(NTL.phys.data, desc(temperature_C))
 # Which dates, lakes, and depths have the highest temperatures?
-
+head(NTL.phys.data.temperature.descending)
+#Summer months, East Long Lake, Hummingbird Lake; 0.5 and 1
 
 ```
 ### Select
+# for columns. filter was for rows.
 
 Selecting allows us to choose certain columns (variables) in our dataset.
 
 ```{r}
-NTL.phys.data.temps <- select(NTL.phys.data, lakename, sampledate:temperature_C)
+NTL.phys.data.temps <- select(NTL.phys.data, lakename, sampledate:temperature_C) # use comas (and) and colons (through). Doesnt work with & for example
 
 ```
 ### Mutate
@@ -146,7 +154,7 @@ Mutating allows us to add new columns that are functions of existing columns. Op
 ```{r}
 
 NTL.phys.data.temps <- mutate(NTL.phys.data.temps, temperature_F = (temperature_C*9/5) + 32)
-
+# the column goes always at the very end. NAs are kept.
 ```
 ### Pipes
 
@@ -156,11 +164,11 @@ Let's say we want to take our raw dataset (NTL.phys.data), *then* filter the dat
 
 ```{r}
 NTL.phys.data.processed <- 
-  NTL.phys.data %>%
-  filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>%
-  select(lakename, sampledate:temperature_C) %>%
+  NTL.phys.data %>% #then   #you declare the data frame one time 
+  filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>% #then
+  select(lakename, sampledate:temperature_C) %>% #then
   mutate(temperature_F = (temperature_C*9/5) + 32)
-  
+# might replace a for loop
 ```
 
 Notice that we did not place the dataset name inside the wrangling function but rather at the beginning.
@@ -168,7 +176,9 @@ Notice that we did not place the dataset name inside the wrangling function but 
 ### Saving processed datasets
 
 ```{r}
-write.csv(NTL.phys.data.PeterPaul1, row.names = FALSE, file = "./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv")
+write.csv(NTL.phys.data.PeterPaul1, row.names = FALSE, file =    
+"./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv")
+#row.names TRUE creates a row number column
 ```
 
 ## CLOSING DISCUSSION
