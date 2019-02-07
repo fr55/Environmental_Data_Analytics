@@ -33,6 +33,7 @@ The completed exercise is due on Thursday, 7 February, 2019 before class begins.
 ```{r}
 getwd() # working directory should be the parent folder for the Environmental Data Analytics Course
 # this specific file path only works in Felipe's Computer
+setwd("C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics") 
 library(tidyverse)
 library(lubridate)
 library(knitr)
@@ -46,7 +47,7 @@ EPA.air.PM25.NC2018.data <- read.csv("./Data/Raw/EPAair_PM25_NC2018_Raw.csv")
 2. Generate a few lines of code to get to know your datasets (basic data summaries, etc.).
 
 ```{r}
-#1 Code for o3 data
+#1
 head(EPA.air.O3.NC2017.data)
 colnames(EPA.air.O3.NC2017.data)
 summary(EPA.air.O3.NC2017.data)
@@ -57,7 +58,7 @@ colnames(EPA.air.O3.NC2018.data)
 summary(EPA.air.O3.NC2018.data)
 dim(EPA.air.O3.NC2018.data)
 
-#2 Code for PM25 data
+#2
 head(EPA.air.PM25.NC2017.data)
 colnames(EPA.air.PM25.NC2017.data)
 summary(EPA.air.PM25.NC2017.data)
@@ -77,36 +78,27 @@ dim(EPA.air.PM25.NC2018.data)
 
 ```{r}
 #3
-# Check class of Date column in every dataset
 class(EPA.air.O3.NC2017.data$Date)
 class(EPA.air.O3.NC2018.data$Date)
 class(EPA.air.PM25.NC2017.data$Date)
 class(EPA.air.PM25.NC2018.data$Date)
 
-# Change class from "factor" to "date".
 EPA.air.O3.NC2017.data$Date <- as.Date(EPA.air.O3.NC2017.data$Date, format = "%m/%d/%y")
 EPA.air.O3.NC2018.data$Date <- as.Date(EPA.air.O3.NC2018.data$Date, format = "%m/%d/%y")
 EPA.air.PM25.NC2017.data$Date <- as.Date(EPA.air.PM25.NC2017.data$Date, format = "%m/%d/%y")
 EPA.air.PM25.NC2018.data$Date <- as.Date(EPA.air.PM25.NC2018.data$Date, format = "%m/%d/%y")
-
 #4
-# Selecting columns.
-EPA.air.O3.NC2017.data.AQI <- select(EPA.air.O3.NC2017.data, Date, DAILY_AQI_VALUE,
-                                     Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
-EPA.air.O3.NC2018.data.AQI <- select(EPA.air.O3.NC2018.data, Date, DAILY_AQI_VALUE,
-                                     Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
-EPA.air.PM25.NC2017.data.AQI <- select(EPA.air.PM25.NC2017.data, Date, DAILY_AQI_VALUE,
-                                       Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
-EPA.air.PM25.NC2018.data.AQI <- select(EPA.air.PM25.NC2018.data, Date, DAILY_AQI_VALUE,
-                                       Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+
+EPA.air.O3.NC2017.data.AQI <- select(EPA.air.O3.NC2017.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.O3.NC2018.data.AQI <- select(EPA.air.O3.NC2018.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.PM25.NC2017.data.AQI <- select(EPA.air.PM25.NC2017.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPA.air.PM25.NC2018.data.AQI <- select(EPA.air.PM25.NC2018.data, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
 
 #5
-# For the two PM2.5 datasets, we fill all cells in AQS_PARAMETER_DESC with "PM2.5".
 EPA.air.PM25.NC2017.data.AQI$AQS_PARAMETER_DESC <- "PM25"
 EPA.air.PM25.NC2018.data.AQI$AQS_PARAMETER_DESC <- "PM25"
 
 #6
-# We save all four processed datasets in the Processed folder.
 write.csv(EPA.air.O3.NC2017.data.AQI, row.names = FALSE, file =    
 "./Data/Processed/EPAair_O3_NC2017_AQI_Processed.csv")
 write.csv(EPA.air.O3.NC2018.data.AQI, row.names = FALSE, file =    
@@ -122,14 +114,12 @@ write.csv(EPA.air.PM25.NC2018.data.AQI, row.names = FALSE, file =
 ## Combine datasets
 7. Combine the four datasets with `rbind`. Make sure your column names are identical prior to running this code. 
 ```{r}
-# Checking if column names are identical between four datasets.
+#Checking if column names are identical
 colnames(EPA.air.O3.NC2017.data.AQI)==colnames(EPA.air.O3.NC2018.data.AQI)
 colnames(EPA.air.O3.NC2017.data.AQI)==colnames(EPA.air.PM25.NC2017.data.AQI)
 colnames(EPA.air.O3.NC2017.data.AQI)==colnames(EPA.air.PM25.NC2018.data.AQI)
 
-# The columns are identical so we can combine the data.
-EPA.air.O3PM25.NC20172018.data.AQI <- rbind(EPA.air.O3.NC2017.data.AQI,EPA.air.O3.NC2018.data.AQI,
-                                            EPA.air.PM25.NC2017.data.AQI, EPA.air.PM25.NC2018.data.AQI)                      
+EPA.air.O3PM25.NC20172018.data.AQI <- rbind(EPA.air.O3.NC2017.data.AQI, EPA.air.O3.NC2018.data.AQI, EPA.air.PM25.NC2017.data.AQI, EPA.air.PM25.NC2018.data.AQI)
 ```
 
 8. Wrangle your new dataset with a pipe function (%>%) so that it fills the following conditions: 
@@ -180,7 +170,7 @@ b. A summary table of the mean, minimum, and maximum AQI values of O3 and PM2.5 
 ```{r}
 #12a
 #Explore the data
-summary(droplevels(EPA.air.O3PM25.NC20172018.data.AQI_piped.spread))
+summary(leveldrops(EPA.air.O3PM25.NC20172018.data.AQI_piped.spread))
 
 summary(subset(EPA.air.O3PM25.NC20172018.data.AQI_piped.spread, Site.Name=="Blackstone",
 select=c(Ozone, PM25)))
@@ -188,8 +178,6 @@ summary(subset(EPA.air.O3PM25.NC20172018.data.AQI_piped.spread, Site.Name=="Brys
 select=c(Ozone, PM25)))
 summary(subset(EPA.air.O3PM25.NC20172018.data.AQI_piped.spread, Site.Name=="Triple Oak",
 select=c(Ozone, PM25)))
-
-#Triple Oak does not have Ozone data
 
 EPA.air.O3PM25.NC20172018.Blackstone.BrysonCity.TripleOak.summary <-
   EPA.air.O3PM25.NC20172018.data.AQI_piped.spread %>%
@@ -213,7 +201,5 @@ EPA.air.O3PM25.NC20172018.Blackstone.BrysonCity.TripleOak.summary2 <-
 #13
 kable(EPA.air.O3PM25.NC20172018.Blackstone.BrysonCity.TripleOak.summary)
 kable(EPA.air.O3PM25.NC20172018.Blackstone.BrysonCity.TripleOak.summary2)
-
-# The NaN and Inf values in Triple Oak are caused because there is no o3 data for Triple Oak
 ```
 
