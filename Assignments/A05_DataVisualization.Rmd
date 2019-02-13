@@ -34,8 +34,41 @@ The completed exercise is due on Thursday, 14 February, 2019 before class begins
 
 ```{r}
 #1
+getwd()
+library(tidyverse)
+
+PeterPaul.ChemPhy.Tidy <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv")
+PeterPaul.ChemPhy.Gathered <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
+USGS_stream_gauge <- read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv")
+EPA_Ecotox_Neonicotinoids <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Mortality_raw.csv")
 
 #2
+
+class(PeterPaul.ChemPhy.Tidy$sampledate)
+class(PeterPaul.ChemPhy.Gathered$sampledate)
+class(USGS_stream_gauge$datetime)
+
+PeterPaul.ChemPhy.Tidy$sampledate <- as.Date(PeterPaul.ChemPhy.Tidy$sampledate, format = "%Y-%m-%d") 
+PeterPaul.ChemPhy.Gathered$sampledate <- as.Date(PeterPaul.ChemPhy.Gathered$sampledate, format = "%Y-%m-%d")
+USGS_stream_gauge$datetime <- as.Date(USGS_stream_gauge$datetime, format = "%m/%d/%y")
+
+USGS_stream_gauge$datetime <- format(USGS_stream_gauge$datetime, "%y%m%d")
+
+# Changes 20 with 19
+create.early.dates <- (function(d) {
+       paste0(ifelse(d > 181231,"19","20"),d)
+       })
+# use the function
+USGS_stream_gauge$datetime <- create.early.dates(USGS_stream_gauge$datetime)
+
+# fix the format
+USGS_stream_gauge$datetime <- as.Date(USGS_stream_gauge$datetime, format = "%Y%m%d") 
+
+class(PeterPaul.ChemPhy.Tidy$sampledate)
+class(PeterPaul.ChemPhy.Gathered$sampledate)
+class(USGS_stream_gauge$datetime)
+
+
 ```
 ## Define your theme
 3. Build a theme and set it as your default theme.
