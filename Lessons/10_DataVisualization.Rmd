@@ -36,7 +36,7 @@ print(O3plot)
 
 O3plot1 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_gray()
+  theme_gray() #default
 print(O3plot1)
 
 O3plot2 <- ggplot(EPAair) +
@@ -51,7 +51,7 @@ print(O3plot3)
 
 O3plot4 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_classic()
+  theme_classic() #Kateri like this one (no grid)
 print(O3plot4)
 ```
 
@@ -64,18 +64,18 @@ Notice that some aspects of your graph have not been adjusted, including:
 If you would like to set a common theme across all plots in your analysis session, you may define a theme and call up that theme for each graph. This eliminates the need to add multiple lines of code in each plot. 
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
-mytheme <- theme_classic(base_size = 14) +
+mytheme <- theme_classic(base_size = 14) + #you can put any name
   theme(axis.text = element_text(color = "black"), 
-        legend.position = "top") #alternative: legend.position + legend.justification
+        legend.position = "top") 
 
 # options: call the theme in each plot or set the theme at the start. 
 
 O3plot5 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  mytheme
+  mytheme #one way of doing it
 print(O3plot5)  
 
-theme_set(mytheme)
+theme_set(mytheme) #this is other way of doing it. Better for several plots.
 
 O3plot6 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
@@ -89,17 +89,17 @@ While the theme allows us to set multiple aspects of plots, ggplot allows us to 
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
 O3plot7 <- ggplot(EPAair, aes(x = Date, y = Ozone)) +
-  geom_rect(xmin = as.Date("2016-01-01"), xmax = as.Date("2020-01-01"), 
+  geom_rect(xmin = as.Date("2016-01-01"), xmax = as.Date("2020-01-01"),  #ojo as.date
             ymin = 0, ymax = 50, fill = "green") +
   geom_rect(xmin = as.Date("2016-01-01"), xmax = as.Date("2020-01-01"), 
             ymin = 50, ymax = 100, fill = "yellow") +
-  geom_point() +
+  geom_point() + #first geom_rect than points
   geom_text(x = as.Date("2019-01-01"), y = 45, label = "good", hjust = 1, fontface = "bold") +
   geom_text(x = as.Date("2019-01-01"), y = 95, label = "moderate", hjust = 1, fontface = "bold") +
   scale_x_date(limits = as.Date(c("2017-01-01", "2018-12-31")), 
     date_breaks = "2 months", date_labels = "%b %y") +
   ylab(expression("O"[3]* " AQI Value")) +
-  theme(axis.text.x = element_text(angle = 45,  hjust = 1))
+  theme(axis.text.x = element_text(angle = 45,  hjust = 1)) #this theme only changes the things you specify
 print(O3plot7)  
 
 ```
@@ -115,7 +115,7 @@ There are several color palettes that are designed to be more effective than pal
 Perception is key! Choose palettes that are visually pleasing and will communicate what you are hoping your audience to perceive. Hint: base R palettes are not ideal.
 
 ```{r, warning = FALSE}
-#install.packages("viridis")
+#install.packages("viridis")    #####use always in the beginign
 #install.packages("RColorBrewer")
 #install.packages("colormap")
 library(viridis)
@@ -125,7 +125,7 @@ library(colormap)
 scales::show_col(colormap(colormap = colormaps$viridis, nshades = 16))
 scales::show_col(colormap(colormap = colormaps$inferno, nshades = 16))
 scales::show_col(colormap(colormap = colormaps$magma, nshades = 16))
-display.brewer.all(n = 9)
+display.brewer.all(n = 9) # from the website you cna use. color blind!!!!
 
 NvsP <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth, shape = lakename)) +
@@ -138,28 +138,32 @@ print(NvsP)
 NvsP2 <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth, shape = lakename)) +
   geom_point(alpha = 0.8, size = 3) +
-  #xlab() +
-  #ylab() +
+  xlab(expression("Total Phosphorus, (\U003BCg/lt)")) + #there are codes for greek leters
+  ylab(expression("Total Nitrogen (\U003BCg/lt)")) +
   # change your legend labels here
   scale_shape_manual(values = c(15, 17)) +
-  #scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
+ # scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
   scale_color_viridis(option = "magma", direction = -1) +
   theme(legend.position = "right", 
         legend.text = element_text(size = 12), legend.title = element_text(size = 12))
-print(NvsP2)
+print(NvsP2)  #change legend titles (we tried to do it)
 
 # change your y axis label to list concentration in micrograms per liter
 # remove your x axis label
 # change labels for nutrients in the legend
+
 Nutrientplot <-
   ggplot(PeterPaul.nutrients.gathered, aes(x = lakename, y = concentration, color = nutrient)) +
   geom_boxplot() +
 # place your additional edits here
   scale_y_continuous(expand = c(0, 0)) +
   #scale_color_brewer(palette = "YlGnBu") +
-  #scale_color_manual(values = c("#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84")) +
-  #scale_color_viridis(discrete = TRUE) +
-  theme(legend.position = "right")
+  scale_color_manual(values = c("#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84")) + #from the website
+  #scale_color_viridis(discrete = TRUE) + #another option. problem with the yellow.
+  theme(legend.position = "right") +
+  ylab(expression("Concentration (\U003BCg/lt)")) +
+  xlab(expression(""))
+
 print(Nutrientplot)
 ```
 
@@ -171,7 +175,7 @@ PMplot.faceted <-
   geom_point() +
   facet_grid(Site.Name ~ year) + 
   scale_x_continuous(breaks = c(1:12)) +
-  #theme(strip.background = element_rect(fill = "black"), strip.text = element_text(color = "white"))
+  theme(strip.background = element_rect(fill = "black"), strip.text = element_text(color = "white")) +
   ylab(expression("PM 2.5 AQI Value")) 
 print(PMplot.faceted)
 
@@ -188,7 +192,7 @@ grid.arrange(O3plot7, PMplot.faceted)
 
 ```
 
-### Saving plots
+### Saving plots #reprodusable way
 The `ggsave` function allows you to save plots in jpg, png, eps, pdf, tiff, and other formats. The following information can be supplied: 
 
 * filename, with file extension and in quotes (required)
@@ -198,5 +202,5 @@ The `ggsave` function allows you to save plots in jpg, png, eps, pdf, tiff, and 
 * resolution (dpi)
 
 For example: 
-`ggsave("PMplot.jpg", PMplot.faceted,  path = "./Output/PMplotjpg", height = 4, width = 6, units = "in", dpi = 300)`
+`ggsave("PMplot.jpg", PMplot.faceted,  path = "./Output/PMplot.jpg", height = 4, width = 6, units = "in", dpi = 300)`
 

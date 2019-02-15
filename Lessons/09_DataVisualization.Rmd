@@ -91,7 +91,7 @@ print(PMplot)
 PMplot.faceted <-
   ggplot(EPAair, aes(x = Month, y = PM25, shape = as.factor(Year))) +
   geom_point() +
-  facet_wrap(vars(Site.Name), nrow = 3) #new layer. three rows. three graphs. if not default is columns.
+  facet_wrap(vars(Site.Name)) #new layer. three rows. three graphs. if not default is columns.
 print(PMplot.faceted)
 
 PMplot.faceted2 <-
