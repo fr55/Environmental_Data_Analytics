@@ -33,12 +33,17 @@ The completed exercise is due on Tuesday, 19 February, 2019 before class begins.
 2. Make sure R is reading dates as date format, not something else (hint: remember that dates were an issue for the USGS gauge data).
 
 ```{r}
+
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, eval=TRUE)
+
 #1
 getwd()
 #install.packages('ggpubr')
 library(tidyverse)
 library(RColorBrewer)
 library(ggpubr)
+library(viridis)
+library(colormap)
 
 PeterPaul.ChemPhy.Tidy <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv")
 PeterPaul.ChemPhy.Gathered <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
@@ -50,6 +55,8 @@ EPA_Ecotox_Neonicotinoids <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Mortalit
 class(PeterPaul.ChemPhy.Tidy$sampledate)
 class(PeterPaul.ChemPhy.Gathered$sampledate)
 class(USGS_stream_gauge$datetime)
+
+#EPA_Ecotox does not have dates
 
 PeterPaul.ChemPhy.Tidy$sampledate <- as.Date(PeterPaul.ChemPhy.Tidy$sampledate, format = "%Y-%m-%d") 
 PeterPaul.ChemPhy.Gathered$sampledate <- as.Date(PeterPaul.ChemPhy.Gathered$sampledate, format = "%Y-%m-%d")
@@ -67,10 +74,10 @@ USGS_stream_gauge$datetime <- create.early.dates(USGS_stream_gauge$datetime)
 # fix the format
 USGS_stream_gauge$datetime <- as.Date(USGS_stream_gauge$datetime, format = "%Y%m%d") 
 
+#Check the correct format
 class(PeterPaul.ChemPhy.Tidy$sampledate)
 class(PeterPaul.ChemPhy.Gathered$sampledate)
 class(USGS_stream_gauge$datetime)
-
 
 ```
 
@@ -82,6 +89,7 @@ class(USGS_stream_gauge$datetime)
 felipe_theme <- theme_light(base_size = 12) +
   theme(axis.text = element_text(color = "grey8"), 
         legend.position = "right") 
+theme_set(felipe_theme)
 ```
 
 ## Create graphs
@@ -93,8 +101,6 @@ Hint: a good way to build graphs is to make them ugly first and then create more
 
 ```{r}
 #4
-theme_set(felipe_theme)
-
 phophorus_ate_PLOT <- ggplot(PeterPaul.ChemPhy.Tidy, aes(x = po4, y = tp_ug)) +
   geom_point(aes(color = lakename)) +
   xlim(0, 50) + 
@@ -102,7 +108,10 @@ phophorus_ate_PLOT <- ggplot(PeterPaul.ChemPhy.Tidy, aes(x = po4, y = tp_ug)) +
   xlab(expression("Phosphate")) +
   ylab(expression("Total Phosphorus (\U003BCg/lt)"))+
   labs(color = 'Lake Name') +
-  scale_color_manual(values = c("#e66101", "#5e3c99"))
+  scale_color_manual(values = c("#e66101", "#5e3c99")) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Total Phosphorus by Phosphate")
+
 
 print(phophorus_ate_PLOT)
 
@@ -111,19 +120,17 @@ print(phophorus_ate_PLOT)
 
 5. [NTL-LTER] Plot nutrients by date for Peter Lake, with separate colors for each depth. Facet your graph by the nutrient type.
 
-```{r}
+```{r, fig.height = 10, fig.width = 7}
 #5
-theme_set(felipe_theme)
-
 Nutr_date_PLOT <- ggplot(subset(PeterPaul.ChemPhy.Gathered, lakename %in% c("Peter Lake")), aes(x = sampledate, y = concentration)) +
   geom_point(aes(color = depth)) +
-  #xlim(0, 50) + 
-   xlab(expression("Date")) +
+  xlab(expression("Date")) +
   ylab(expression("Concentration"))+
   labs(color = 'Depth') +
   scale_color_distiller(palette = "BrBG") +
-  #facet_grid(nutrient ~ year4)
-  facet_wrap(vars(nutrient), nrow = 5, scales = "free")
+  facet_wrap(vars(nutrient), nrow = 5, scales = "free") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Nutrients by Date for Peter Lake") 
 
 print(Nutr_date_PLOT)
 ```
@@ -131,95 +138,113 @@ print(Nutr_date_PLOT)
 
 6. [USGS gauge] Plot discharge by date. Create two plots, one with the points connected with geom_line and one with the points connected with geom_smooth (hint: do not use method = "lm"). Place these graphs on the same plot (hint: ggarrange or something similar)
 
-```{r}
+```{r, fig.height = 10, fig.width = 7}
 #6
-theme_set(felipe_theme)
-
-head(USGS_stream_gauge)
-
-Discharge_date_line_PLOT <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X165986_00060_00001)) +
-  geom_point() +
-  geom_line() +
-  #xlim(0, 50) + 
-  #geom_smooth(method = lm, color = "black") +
+# First for the max. discharge rate
+Discharge_date_line_PLOT <- ggplot(USGS_stream_gauge, 
+                                   aes(x = datetime, y = X165986_00060_00001)) +
+  geom_point(color = "deepskyblue2") +
+  geom_line(size=0.1) +
   xlab(expression("Date")) +
   ylab(expression("Max Discharge, (cf/s)")) +
-  #labs(color = 'Lake Name') +
-  scale_color_manual(values = c("#e66101"))
-
-print(Discharge_date_line_PLOT)
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Max. Discharge with geom_line")
 
 Discharge_date_smooth_PLOT <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X165986_00060_00001)) +
-  geom_point() +
-  #geom_line() +
-  #xlim(0, 50) + 
-  geom_smooth() +
+  geom_point(color = "deepskyblue2") +
+  geom_smooth(color = "black") +
   xlab(expression("Date")) +
   ylab(expression("Max Discharge, (cf/s)")) +
-  #labs(color = 'Lake Name') +
-  scale_color_manual(values = c("#e66101"))
-
-print(Discharge_date_smooth_PLOT)
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Max. Discharge with geom_smooth")
 
 ggarrange(Discharge_date_line_PLOT, Discharge_date_smooth_PLOT, nrow = 2)
 
-Discharge_date_line_PLOT2 <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X84936_00060_00003)) +
-  geom_point() +
-  geom_line() +
-  scale_x_date(limits = as.Date(c("2004-11-01", "2018-12-31"))) +
-  #geom_smooth(method = lm, color = "black") +
-  xlab(expression("Date")) +
-  ylab(expression("Mean Discharge, (cf/s)")) +
-  #labs(color = 'Lake Name') +
-  scale_color_manual(values = c("#e66101"))
+# Second for the mean discharge rate
 
-print(Discharge_date_line_PLOT2)
+Discharge_date_line_PLOT2 <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X84936_00060_00003)) +
+  geom_point(color = "deepskyblue2") +
+  geom_line(size=0.1) +
+  xlab(expression("Date")) +
+  ylab(expression("Max Discharge, (cf/s)")) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Min. Discharge with geom_line") +
+  scale_x_date(limits = as.Date(c("2004-11-01", "2018-12-31")))
 
 Discharge_date_smooth_PLOT2 <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X84936_00060_00003)) +
-  geom_point() +
-  #geom_line() +
-  scale_x_date(limits = as.Date(c("2004-11-01", "2018-12-31"))) + 
-  geom_smooth() +
+  geom_point(color = "deepskyblue2") +
+  geom_smooth(color = "black") +
   xlab(expression("Date")) +
-  ylab(expression("Mean Discharge, (cf/s)")) +
-  #labs(color = 'Lake Name') +
-  scale_color_manual(values = c("#e66101")) #not working
-
-print(Discharge_date_smooth_PLOT2)
+  ylab(expression("Max Discharge, (cf/s)")) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Min. Discharge with geom_smooth") +
+  scale_x_date(limits = as.Date(c("2004-01-01", "2018-12-31")))
 
 ggarrange(Discharge_date_line_PLOT2, Discharge_date_smooth_PLOT2, nrow = 2)
 
+# Third for the min. discharge rate
+Discharge_date_line_PLOT3 <- ggplot(USGS_stream_gauge, 
+                                   aes(x = datetime, y = X165987_00060_00002)) +
+  geom_point(color = "deepskyblue2") +
+  geom_line(size=0.1) +
+  xlab(expression("Date")) +
+  ylab(expression("Max Discharge, (cf/s)")) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Min. Discharge with geom_line") +
+  scale_x_date(limits = as.Date(c("2004-11-01", "2018-12-31")))
 
+
+Discharge_date_smooth_PLOT3 <- ggplot(USGS_stream_gauge, aes(x = datetime, y = X165987_00060_00002)) +
+  geom_point(color = "deepskyblue2") +
+  geom_smooth(color = "black") +
+  xlab(expression("Date")) +
+  ylab(expression("Max Discharge, (cf/s)")) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Min. Discharge with geom_smooth") +
+  scale_x_date(limits = as.Date(c("1995-06-01", "2018-12-31")))
+
+
+ggarrange(Discharge_date_line_PLOT3, Discharge_date_smooth_PLOT3, nrow = 2)
 ```
 Question: How do these two types of lines affect your interpretation of the data?
 
-> Answer:
+> Answer:  The geom_line connects and goes through all the points in the data, showing clearly the extremes values of it, specially the peaks or max values of the data and are useful when trying to visualize these kind of behaviors; whereas, the geom_smooth line shows the global trends of the data, and is much less affected by the extremes. This kind of line is useful to interpret longer term trends in the data. 
 
 7. [ECOTOX Neonicotinoids] Plot the concentration, divided by chemical name. Choose a geom that accurately portrays the distribution of data points.
 
-```{r}
+```{r, fig.height = 10, fig.width = 7}
 #7 
-theme_set(felipe_theme)
 
-head(EPA_Ecotox_Neonicotinoids$Conc..Mean..Std.)
-
-Ecotox_Conc_PLOT <- ggplot(EPA_Ecotox_Neonicotinoids, aes(x = Chemical.Name, y = Conc..Mean..Std.)) +
+#Full Plot
+Ecotox_Conc_PLOT3 <- ggplot(subset(EPA_Ecotox_Neonicotinoids, Conc..Units..Std. 
+                                   %in% c("AI mg/L", "mg/L")), 
+                            aes(x = Chemical.Name, y = Conc..Mean..Std., fill = Chemical.Name)) +
   geom_boxplot() +
+  theme(plot.title = element_text(hjust = 0.5)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_color_brewer(palette = "YlGnBu") +
-
-  ylim(0, 1500)
- # xlab(expression("Date")) +
-#  ylab(expression("Concentration"))+
- # labs(color = 'Depth') +
-  #scale_color_distiller(palette = "BrBG") +
-  #facet_grid(nutrient ~ year4)
-  #facet_wrap(vars(nutrient), nrow = 5, scales = "free")
-
-print(Ecotox_Conc_PLOT)
+  scale_color_brewer(palette = "Set1") +
+  guides(fill=FALSE) +
+  xlab(expression("Chemical Name")) +
+  ylab(expression("Concentration (mg/L)")) +
+  ggtitle("Concentration by Chemical")
 
 
+#Zooming 0-90 mg/L
+Ecotox_Conc_PLOT2 <- ggplot(subset(EPA_Ecotox_Neonicotinoids, Conc..Units..Std. 
+                                   %in% c("AI mg/L", "mg/L")), 
+                            aes(x = Chemical.Name, y = Conc..Mean..Std., fill = Chemical.Name)) +
+  geom_boxplot() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_color_brewer(palette = "Set1") +
+  ylim(0, 90) +
+  guides(fill=FALSE) +
+  xlab(expression("Chemical Name")) +
+  ggtitle("Concentration by Chemical (between 0 - 80 mg/L)") + 
+  ylab(expression("Concentration (mg/L)"))
 
+ 
+ggarrange(Ecotox_Conc_PLOT3, Ecotox_Conc_PLOT2, nrow = 2)
 
 
 ```
