@@ -27,10 +27,10 @@ EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 PeterPaul.nutrients$sampledate <- as.Date(PeterPaul.nutrients$sampledate, format = "%Y-%m-%d")
 
 # remove negative values for depth_id
-PeterPaul.nutrients <- filter(PeterPaul.nutrients, depth_id > 0)
+PeterPaul.nutrients <- filter(PeterPaul.nutrients, depth_id > 0) #is a weird ID that was given. Just remove for this example. 
 
 # set depth_id to factor
-PeterPaul.nutrients$depth_id <- as.factor(PeterPaul.nutrients$depth_id)
+PeterPaul.nutrients$depth_id <- as.factor(PeterPaul.nutrients$depth_id) # we want later factor instead of numeric.
 
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
@@ -67,46 +67,46 @@ The GLM is based on the assumption that the data approximate a normal distributi
 ### One-sample t-test
 The object of a one sample test is to test the null hypothesis that the mean of the group is equal to a specific value. For example, we might ask ourselves (from the EPA air quality processed dataset): 
 
-Are Ozone levels below the threshold for "good" AQI index (0-50)?
+Are Ozone levels below the threshold for "good" AQI index (0-50)?  #T test.
 
 ```{r}
 summary(EPAair$Ozone)
 
 # Evaluate assumption of normal distribution
-shapiro.test(EPAair$Ozone)
+shapiro.test(EPAair$Ozone) #test aprox. to normal dist. pvalue less than 5% not Ok. So lets take a look
 ggplot(EPAair, aes(x = Ozone)) +
-  geom_histogram(stat = "count")
-qqnorm(EPAair$Ozone); qqline(EPAair$Ozone)
+  geom_histogram(stat = "count") #wrong peak and long tail to the right
+qqnorm(EPAair$Ozone); qqline(EPAair$Ozone) # other way to look at it. We go ahead any way becuase a lot of data and shape resembles
 
-O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less")
-O3.onesample
+O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less") # we are asking if data below threshold than 50.
+O3.onesample # store the result. P value low. reject null hypothesis. give also t score. Linear model y = 36.9 ] error
 ```
 
 What information does the output give us? How might we report this information in a report?
 
-> ANWSER:
+> ANSWER: Ozone AQI values in 2017-2018 were significanly lower than 50 (one sample t-test; t = -41.9, df =184, p<0.0001) 
 
-### Two-sample t-test
+### Two-sample t-test #second alpha value in the linear model
 The two-sample *t* test is used to test the hypothesis that the mean of two samples is equivalent. Unlike the one-sample tests, a two-sample test requires a second assumption that the variance of the two groups is equivalent. Are Ozone levels different between Blackstone and Bryson City?
 
 ```{r}
 shapiro.test(EPAair$Ozone[EPAair$Site.Name == "Blackstone"])
 shapiro.test(EPAair$Ozone[EPAair$Site.Name == "Bryson City"])
-var.test(EPAair$Ozone ~ EPAair$Site.Name)
+var.test(EPAair$Ozone ~ EPAair$Site.Name) # f statistic and pvalue. variance the same? Pvalue low, the variance is not the same. The interval does not overlap 1.
 
 ggplot(EPAair, aes(x = Ozone, color = Site.Name)) +
-  geom_freqpoly(stat = "count")
-
+  geom_freqpoly(stat = "count") # just to look how they relate to each other (look at tails, peaks)
+# two ways of doing it
 # Format as a t-test
 O3.twosample <- t.test(EPAair$Ozone ~ EPAair$Site.Name)
 O3.twosample
-O3.twosample$p.value
-
-# Format as a GLM
+O3.twosample$p.value # we have a significance differnet in the means between the 2 groups.
+# so the linear model is y = Blackstone(38.48) + BrysonCity(35.18) + error
+# Format as a GLM #other way of doing it
 O3.twosample2 <- lm(EPAair$Ozone ~ EPAair$Site.Name)
-summary(O3.twosample2)
+summary(O3.twosample2) #diff pvalue. same estimates but bryson is relative. We get a lot of aditional info not useful right now.
 ```
-### Non-parametric equivalent of t-test: Wilcoxon test
+### Non-parametric equivalent of t-test: Wilcoxon test #for not normal distribution. distribution free
 
 When we wish to avoid the assumption of normality, we can apply *distribution-free*, or non-parametric, methods in the form of the Wilcoxon rank sum (Mann-Whitney) test. The Wilcoxon test replaces the data by their rank and calculates the sum of the ranks for each group. Notice that the output of the Wilcoxon test is more limited than its parametric equivalent.
 
@@ -114,7 +114,7 @@ When we wish to avoid the assumption of normality, we can apply *distribution-fr
 O3.onesample.wilcox <- wilcox.test(EPAair$Ozone, mu = 50, alternative = "less")
 O3.onesample.wilcox
 O3.twosample.wilcox <- wilcox.test(EPAair$Ozone ~ EPAair$Site.Name)
-O3.twosample.wilcox
+O3.twosample.wilcox # much more limited models but we get the info that we wanted. dont tell us the prediction for the means. less explanatory power.
 ```
 
 ### One-way ANOVA
@@ -127,32 +127,32 @@ shapiro.test(EPAair$PM2.5[EPAair$Site.Name == "Bryson City"])
 shapiro.test(EPAair$PM2.5[EPAair$Site.Name == "Triple Oak"])
 
 ggplot(EPAair, aes(x = PM2.5, color = Site.Name)) +
-  geom_freqpoly(stat = "count")
-qqnorm(EPAair$PM2.5); qqline(EPAair$PM2.5)
+  geom_freqpoly(stat = "count") # fairly good bell curve. not crazy tails. maybe we may wanna proceed with anova
+qqnorm(EPAair$PM2.5); qqline(EPAair$PM2.5) # looks good except for the tails. not surprising for environ data.
 
-bartlett.test(EPAair$PM2.5 ~ EPAair$Site.Name)
-
+bartlett.test(EPAair$PM2.5 ~ EPAair$Site.Name) # var equal? here they are not significance diff. reach assumption of equal differnece.
+#two ways
 # Format as a GLM
 PM2.5.anova <- lm(EPAair$PM2.5 ~ EPAair$Site.Name)
-summary(PM2.5.anova)
+summary(PM2.5.anova) # linear model y = 36.7261 - 4.4266Bryson -3.24TripleOak #here we only know that the intercept is signif diff from 0, and the other variables signif diff from intercept.
 
 # Format as an aov
 PM2.5.anova2 <- aov(EPAair$PM2.5 ~ EPAair$Site.Name)
-summary(PM2.5.anova2)
+summary(PM2.5.anova2) #just give us if site is significant predictor. we need a posthoc test
 
 # Run a post-hoc test for pairwise differences
-TukeyHSD(PM2.5.anova2)
+TukeyHSD(PM2.5.anova2) #there is no diff between Triple and Bryson
 
 # Plot the results
 # How might you edit this graph to make it attractive?
 # How might you illustrate significant differences?
 PM2.5.anova.plot <- ggplot(EPAair, aes(x = Site.Name, y = PM2.5)) +
   geom_violin(draw_quantiles = 0.5)
-print(PM2.5.anova.plot)
+print(PM2.5.anova.plot) #to look at the distribution
 ```
 What information does the output give us? How might we report this information in a report?
 
-> ANSWER:
+> ANSWer: (ANOVA; F = 16.16, df =1898,  p < 0.0001). Our average pm25 values where signif....     .On the plot. Put a star on blackstone or group them (bryson and triple under a hay or something geomtext or something)
 
 ### Non-parametric equivalent of ANOVA: Kruskal-Wallis Test
 As with the Wilcoxon test, the Kruskal-Wallis test is the non-parametric counterpart to the one-way ANOVA. Here, the data from two or more independent samples are replaced with their ranks without regard to the grouping AND based on the between-group sum of squares calculations. 
@@ -163,30 +163,31 @@ To analyze specific pairs in the data, you must use a *post hoc* test. These inc
 
 ```{r}
 PM2.5.kw <- kruskal.test(EPAair$PM2.5 ~ EPAair$Site.Name)
-PM2.5.kw
-
+PM2.5.kw # doesnt indicate which groups are diff.
+#the next tells you but we are not going to do it.
 # There are two functions to run the Dunn Test
 # dunn.test(EPAair$PM2.5, EPAair$Site.Name, kw = T, 
 #           table = F, list = T, method = "holm", altp = T)   #From package dunn.test
 # dunnTest(EPAair$PM2.5, EPAair$Site.Name)                    #From package FSA
 ```
 
-## TWO-WAY ANOVA
+## TWO-WAY ANOVA #convination of multiple diff outputs y = alphaa1 + alphaa2+ alphab1 + alphab2 + error
 ### Main effects
 A two-way ANOVA allows us to examine the effects of two categorical explanatory variables on a continuous response variable. Let's look at the NTL-LTER nutrient dataset for Peter and Paul lakes. What if we wanted to know if total nitrogen concentrations differed based on lake and depth? 
 
 ```{r}
-TNanova.main <- lm(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename + PeterPaul.nutrients$depth_id)
-summary(TNanova.main)
-
+TNanova.main <- lm(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename + # the plus is the main effefct anova
+                     PeterPaul.nutrients$depth_id)
+summary(TNanova.main) #TN = y = 309(paul lake dpeth id of 1) + 105.2PeterLake(id1) + 97id2.. + error. id5 and id6 dont have relevant pvalues.
+#two ways to do it
 TNanova.main2 <- aov(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename + PeterPaul.nutrients$depth_id)
 summary(TNanova.main2)
 
-TukeyHSD(TNanova.main2)
+TukeyHSD(TNanova.main2) # all the combinations
 
 # Plot the results
 # How might you edit this graph to make it attractive?
-# How might you illustrate significant differences?
+# How might you illustrate significant differences? #using diff pallete
 TNanova.plot <- ggplot(PeterPaul.nutrients, aes(x = lakename, y = tn_ug, color = depth_id)) +
   geom_boxplot()
 print(TNanova.plot)
@@ -198,14 +199,15 @@ We may expect the effects of lake and depth to be dependent on each other. For i
 The output gives test statistics for each explanatory variable as well as the interaction effect of the explanatory variables. If the p-value for the interaction effect is less than 0.05, then we would consider the interaction among the explanatory variables to be significant.
 
 ```{r}
-TNanova.interaction <- aov(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename * PeterPaul.nutrients$depth_id)
+TNanova.interaction <- aov(PeterPaul.nutrients$tn_ug ~ PeterPaul.nutrients$lakename * #interaction 
+                             PeterPaul.nutrients$depth_id)
 summary(TNanova.interaction)
-
+# there is an interaction
 ```
 
 If the interaction is significant, we interpret pairwise differences for the interaction. If the interaction is not significant, we interpret differences for the main effects only.
 ```{r}
-TukeyHSD(TNanova.interaction)
+TukeyHSD(TNanova.interaction) #we have an interaction so we oook the third level. explained below
 ```
 
 Pairs are considered to be in the same grouping if the p-value for that pairing is > 0.05. It is easy to see that this grouping process can become complicated when many factors are present for each variable! For a challenge, try writing code that will generate groupings for each factor level in the dataset using the `glht` function in the `multcomp` package. 
