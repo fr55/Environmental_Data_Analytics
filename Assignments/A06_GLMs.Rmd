@@ -1,6 +1,6 @@
 ---
 title: "Assignment 6: Generalized Linear Models"
-author: "Student Name"
+author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -33,10 +33,27 @@ The completed exercise is due on Tuesday, 26 February, 2019 before class begins.
 2. Build a ggplot theme and set it as your default theme.
 
 ```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, eval=TRUE)
+
 #1
+getwd()
+#install.packages('FSA')
+library(FSA)
+library(tidyverse)
+library(RColorBrewer)
+library(ggpubr)
+library(viridis)
+library(colormap)
+
+EPA_Ecotox_Neonicotinoids <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Mortality_raw.csv")
+
+NTL_TER_raw_chemistryphysics <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
 
 #2
-
+felipe_theme <- theme_light(base_size = 12) +
+  theme(axis.text = element_text(color = "grey8"), 
+        legend.position = "right", plot.title = element_text(hjust = 0.5)) 
+theme_set(felipe_theme)
 ```
 
 ## Neonicotinoids test
@@ -50,31 +67,158 @@ Research question: Were studies on various neonicotinoid chemicals conducted in 
 
 ```{r}
 #3
+levels(EPA_Ecotox_Neonicotinoids$Chemical.Name)
+length(levels(EPA_Ecotox_Neonicotinoids$Chemical.Name))
+# Numbers of different chemicals listed in the Chemical.Name column.
 
 #4
+# To evaluate assumption of normal distribution we run the Shapiro-Wilk test 
+# for each chemical, where the null hypothesis is that the data come from a normal distribution.
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name
+                                                 == "Acetamiprid"])
+# Acetamiprid data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.90191, p-value = 5.706e-08).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Clothianidin"])
+# Clothianidin data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.69577, p-value = 4.287e-11).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Dinotefuran"])
+# Dinotefuran data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.82848, p-value = 8.83e-07).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Imidacloprid"])
+# Imidacloprid data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.88178, p-value < 2.2e-16).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Imidaclothiz"])
+# Imidaclothiz data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.68429, p-value = 0.00093).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Nitenpyram"])
+# Nitenpyram data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.79592, p-value = 0.0005686).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Nithiazine"])
+# Nithiazine data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.75938, p-value = 0.0001235).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Thiacloprid"])
+# Thiacloprid data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.7669, p-value = 1.118e-11).
+
+shapiro.test(EPA_Ecotox_Neonicotinoids$Pub..Year[EPA_Ecotox_Neonicotinoids$Chemical.Name 
+                                                 == "Thiamethoxam"])
+# Thiamethoxam data are significantly different from 
+# a normal distribution (Shapiro-Wilk normality test, W = 0.7071, p-value < 2.2e-16).
+
+#Graphic Analysis
+ggplot(EPA_Ecotox_Neonicotinoids, aes(x = Pub..Year, color = Chemical.Name)) +
+  geom_freqpoly(stat = "count")
+
+# The graphic analysis gave as a result that the assumption that the 
+# data are normally distributed is not met. The data don't have a single peak 
+# around the mean and has a longer tail towards the earlier years.
 
 #5
-
+# We perform a Bartlett's test of the null hypothesis that the variances in each 
+# of the groups are the same.
+bartlett.test(EPA_Ecotox_Neonicotinoids$Pub..Year ~ EPA_Ecotox_Neonicotinoids$Chemical.Name)
+# The variance of the data are significantly different from 
+# each other (Bartlett test, K-squared = 139.59, df = 8, p-value < 2.2e-16).
 ```
 
 6. Based on your results, which test would you choose to run to answer your research question?
 
-> ANSWER: 
+> ANSWER: Considering that the data are not well-approximated by a normal distribution and there is not equal variance among the publication years for each chemical, we choose the Kruskal-Wallis test, which is the non-parametric counterpart to the one-way ANOVA.  
 
 7. Run this test below. 
 
 8. Generate a boxplot representing the range of publication years for each chemical. Adjust your graph to make it pretty.
-```{r}
+```{r, fig.height = 4.5, fig.width = 7}
 #7
+PubYear.kW_test <- kruskal.test(
+  EPA_Ecotox_Neonicotinoids$Pub..Year ~ EPA_Ecotox_Neonicotinoids$Chemical.Name)
+PubYear.kW_test
+# There are significant differences between the number of studies on various
+# neonicotinoid chemicals conducted in different years (Kruskal-Wallis chi-squared =
+# 134.15, df = 8, p-value < 2.2e-16). Nevertheless, we don't know which groups differ
+# from each other.
+
+dunnTest(EPA_Ecotox_Neonicotinoids$Pub..Year, EPA_Ecotox_Neonicotinoids$Chemical.Name)
+
+# Groups that differ
+# Acetamiprid - Clothianidin (Dunn Test, Z=-3.0388079, p<0.05)
+# Clothianidin - Dinotefuran  (Dunn Test, Z=4.4060765, p<0.05)
+# Acetamiprid - Imidacloprid (Dunn Test, Z=-4.0204987, p<0.05)
+# Dinotefuran - Imidacloprid (Dunn Test, Z=-5.2140290, p<0.05)
+# Acetamiprid - Nitenpyram (Dunn Test, Z=-4.5018639, p<0.05)
+# Dinotefuran - Nitenpyram (Dunn Test, Z=-5.4527796, p<0.05)
+# Imidacloprid - Nitenpyram (Dunn Test, Z=-3.0634837, p<0.05)
+# Acetamiprid - Nithiazine (Dunn Test, Z=5.6425299, p<0.05)
+# Clothianidin - Nithiazine (Dunn Test, Z=7.1473251, p<0.05)
+# Dinotefuran - Nithiazine (Dunn Test, Z=3.8693508, p<0.05) 
+# Imidacloprid - Nithiazine (Dunn Test, Z=7.7286349, p<0.05) 
+# Imidaclothiz - Nithiazine (Dunn Test, Z=4.8473136, p<0.05)
+# Nitenpyram - Nithiazine (Dunn Test, Z=7.7099812, p<0.05)
+# Acetamiprid - Thiacloprid (Dunn Test, Z=-3.2225618, p<0.05) 
+# Dinotefuran - Thiacloprid (Dunn Test, Z=-4.6025295, p<0.05)  
+# Nithiazine - Thiacloprid (Dunn Test, Z=-7.3166886, p<0.05)  
+# Acetamiprid - Thiamethoxam (Dunn Test, Z=-5.8898861, p<0.05) 
+# Dinotefuran - Thiamethoxam (Dunn Test, Z=-6.6762123, p<0.05)  
+# Imidacloprid - Thiamethoxam (Dunn Test, Z=-3.5327039, p<0.05) 
+# Nithiazine - Thiamethoxam (Dunn Test, Z=-8.7224129, p<0.05)  
 
 #8
+#Plot
+EPA_Ecotox_Neon_Plot <- ggplot(EPA_Ecotox_Neonicotinoids, 
+                               aes(x = Chemical.Name, y = Pub..Year, 
+                                   fill = Chemical.Name)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(palette = "Set1") +
+  guides(fill=FALSE) +
+  xlab(expression("Chemical Name")) +
+  ylab(expression("Year")) +
+  ggtitle("Range of publication years by chemical")
+print(EPA_Ecotox_Neon_Plot)
+
 
 ```
 
 
 9. How would you summarize the conclusion of your analysis? Include a sentence summarizing your findings and include the results of your test in parentheses at the end of the sentence. 
 
-> ANSWER: 
+> ANSWER: There are significant differences between the number of studies on various neonicotinoid chemicals conducted in different years (Kruskal-Wallis chi-squared = 134.15, df = 8, p-value < 2.2e-16). the number of studies on various neonicotinoid chemicals conducted in different years that differ from each other are:
+
+> Acetamiprid - Clothianidin (Dunn Test, Z=-3.0388079, p<0.05)  
+> Clothianidin - Dinotefuran  (Dunn Test, Z=4.4060765, p<0.05)  
+> Acetamiprid - Imidacloprid (Dunn Test, Z=-4.0204987, p<0.05)  
+> Dinotefuran - Imidacloprid (Dunn Test, Z=-5.2140290, p<0.05)  
+> Acetamiprid - Nitenpyram (Dunn Test, Z=-4.5018639, p<0.05)  
+> Dinotefuran - Nitenpyram (Dunn Test, Z=-5.4527796, p<0.05)  
+> Imidacloprid - Nitenpyram (Dunn Test, Z=-3.0634837, p<0.05)  
+> Acetamiprid - Nithiazine (Dunn Test, Z=5.6425299, p<0.05)  
+> Clothianidin - Nithiazine (Dunn Test, Z=7.1473251, p<0.05)  
+> Dinotefuran - Nithiazine (Dunn Test, Z=3.8693508, p<0.05)   
+> Imidacloprid - Nithiazine (Dunn Test, Z=7.7286349, p<0.05)   
+> Imidaclothiz - Nithiazine (Dunn Test, Z=4.8473136, p<0.05)  
+> Nitenpyram - Nithiazine (Dunn Test, Z=7.7099812, p<0.05)  
+> Acetamiprid - Thiacloprid (Dunn Test, Z=-3.2225618, p<0.05)   
+> Dinotefuran - Thiacloprid (Dunn Test, Z=-4.6025295, p<0.05)   
+> Nithiazine - Thiacloprid (Dunn Test, Z=-7.3166886, p<0.05)   
+> Acetamiprid - Thiamethoxam (Dunn Test, Z=-5.8898861, p<0.05)  
+> Dinotefuran - Thiamethoxam (Dunn Test, Z=-6.6762123, p<0.05)   
+> Imidacloprid - Thiamethoxam (Dunn Test, Z=-3.5327039, p<0.05)  
+> Nithiazine - Thiamethoxam (Dunn Test, Z=-8.7224129, p<0.05)   
 
 ## NTL-LTER test
 Research question: What is the best set of predictors for lake temperatures in July across the monitoring period at the North Temperate Lakes LTER? 
@@ -89,30 +233,62 @@ Research question: What is the best set of predictors for lake temperatures in J
 
 ```{r}
 #11
+NTL_TER_raw_chemistryphysics$sampledate <-
+  as.Date(NTL_TER_raw_chemistryphysics$sampledate, format = "%m/%d/%y")
+
+NTL_TER_raw_chemistryphysics$sampledate <-
+  format(NTL_TER_raw_chemistryphysics$sampledate, "%m")
+
+NTL_LTER_test <- NTL_TER_raw_chemistryphysics %>%
+  filter(sampledate == "07") %>%
+  select(lakename:daynum, depth, temperature_C) %>%
+  na.omit()
 
 #12
+NTL_LTER_AIC <- lm(data = NTL_LTER_test, temperature_C ~ year4 + daynum + depth)
+step(NTL_LTER_AIC)
+
+# the lower AIC value the better. In this case the better model includes all the explanatory variables.
+
+NTL_LTER_Model <- lm(data = NTL_LTER_test, temperature_C ~ year4 + daynum + depth)
+summary(NTL_LTER_Model)
 
 ```
 
 13. What is the final linear equation to predict temperature from your multiple regression? How much of the observed variance does this model explain?
 
-> ANSWER: 
+> ANSWER: The model explain 74.1% of the observed variance. The final linear equation to predict temprature from the explanatory variables is:
+
+$$ y = \ -8.57556 + \ 0.01135*year + \ 0.0398*day.number  \ -1.94644*depth + \epsilon $$
 
 14. Run an interaction effects ANCOVA to predict temperature based on depth and lakename from the same wrangled dataset.
 
 ```{r}
 #14
+NTL_LTER_Model2 <- lm(data = NTL_LTER_test, temperature_C ~ depth*lakename)
+summary(NTL_LTER_Model2)
+summary.aov(NTL_LTER_Model2)
 
 ```
 
 15. Is there an interaction between depth and lakename? How much variance in the temperature observations does this explain?
 
-> ANSWER: 
+> ANSWER: There is a significant interaction between depth and lake. The model explains 78.5% of the total variance (ANCOVA, F-statistic: 2094 on 17 and 9710 DF, p-value: < 2.2e-16).
 
 16. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
 
 ```{r}
 #16
-
+temperaturebydepth <- ggplot(NTL_LTER_test, aes(x = depth, y = temperature_C, color = lakename)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(x = depth, y = temperature_C, color = lakename),method = 'lm', se = FALSE) +
+  scale_color_brewer(palette = "Set1") +
+  xlab(expression("Depth")) +
+  ylab(expression(paste("Temperature ",degree,"C"))) +
+  ggtitle("Temperature by Depth") +
+  labs(color = 'Lake Name') +
+  ylim(0, 35)
+  
+print(temperaturebydepth)
 ```
 

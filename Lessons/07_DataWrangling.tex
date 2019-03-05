@@ -1,0 +1,652 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={7: Data Wrangling},
+            pdfauthor={Environmental Data Analytics \textbar{} Kateri Salk},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{7: Data Wrangling}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Environmental Data Analytics \textbar{} Kateri Salk}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Spring 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{LESSON OBJECTIVES}\label{lesson-objectives}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the usefulness of data wrangling and its place in the data
+  pipeline
+\item
+  Wrangle datasets with dplyr functions
+\item
+  Apply data wrangling skills to a real-world example dataset
+\end{enumerate}
+
+\subsection{OPENING DISCUSSION}\label{opening-discussion}
+
+After we've completed basic data exploration on a dataset, what step
+comes next? How does this help us to ask and answer questions about
+datasets?
+
+\subsection{SET UP YOUR DATA ANALYSIS
+SESSION}\label{set-up-your-data-analysis-session}
+
+In assignment 3, you explored the North Temperate Lakes Long-Term
+Ecological Research Station data for physical and chemical data. What
+did you learn about this dataset in your assignment?
+
+We will continue working with this dataset today.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{getwd}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages ---------------------------------------------------- tidyverse 1.2.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.0.0     v purrr   0.2.5
+## v tibble  1.4.2     v dplyr   0.7.6
+## v tidyr   0.8.1     v stringr 1.3.1
+## v readr   1.1.1     v forcats 0.3.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"}\NormalTok{)}
+
+\KeywordTok{head}\NormalTok{(NTL.phys.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid  lakename year4 daynum sampledate depth temperature_C
+## 1      L Paul Lake  1984    148    5/27/84  0.00          14.5
+## 2      L Paul Lake  1984    148    5/27/84  0.25            NA
+## 3      L Paul Lake  1984    148    5/27/84  0.50            NA
+## 4      L Paul Lake  1984    148    5/27/84  0.75            NA
+## 5      L Paul Lake  1984    148    5/27/84  1.00          14.5
+## 6      L Paul Lake  1984    148    5/27/84  1.50            NA
+##   dissolvedOxygen irradianceWater irradianceDeck comments
+## 1             9.5            1750           1620     <NA>
+## 2              NA            1550           1620     <NA>
+## 3              NA            1150           1620     <NA>
+## 4              NA             975           1620     <NA>
+## 5             8.8             870           1620     <NA>
+## 6              NA             610           1620     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{colnames}\NormalTok{(NTL.phys.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "lakeid"          "lakename"        "year4"          
+##  [4] "daynum"          "sampledate"      "depth"          
+##  [7] "temperature_C"   "dissolvedOxygen" "irradianceWater"
+## [10] "irradianceDeck"  "comments"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(NTL.phys.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      lakeid                lakename         year4          daynum     
+##  R      :11288   Peter Lake    :11288   Min.   :1984   Min.   : 55.0  
+##  L      :10325   Paul Lake     :10325   1st Qu.:1991   1st Qu.:166.0  
+##  T      : 6107   Tuesday Lake  : 6107   Median :1997   Median :194.0  
+##  W      : 4188   West Long Lake: 4188   Mean   :1999   Mean   :194.3  
+##  E      : 3905   East Long Lake: 3905   3rd Qu.:2006   3rd Qu.:222.0  
+##  M      : 1234   Crampton Lake : 1234   Max.   :2016   Max.   :307.0  
+##  (Other): 1567   (Other)       : 1567                                 
+##    sampledate        depth       temperature_C   dissolvedOxygen 
+##  5/17/94:   84   Min.   : 0.00   Min.   : 0.30   Min.   :  0.00  
+##  9/5/90 :   64   1st Qu.: 1.50   1st Qu.: 5.30   1st Qu.:  0.30  
+##  10/1/07:   61   Median : 4.00   Median : 9.30   Median :  5.60  
+##  9/10/90:   61   Mean   : 4.39   Mean   :11.81   Mean   :  4.97  
+##  5/10/87:   60   3rd Qu.: 6.50   3rd Qu.:18.70   3rd Qu.:  8.40  
+##  5/9/88 :   60   Max.   :20.00   Max.   :34.10   Max.   :802.00  
+##  (Other):38224                   NA's   :3858    NA's   :4039    
+##  irradianceWater     irradianceDeck  
+##  Min.   :   -0.337   Min.   :   1.5  
+##  1st Qu.:   14.000   1st Qu.: 353.0  
+##  Median :   65.000   Median : 747.0  
+##  Mean   :  210.242   Mean   : 720.5  
+##  3rd Qu.:  265.000   3rd Qu.:1042.0  
+##  Max.   :24108.000   Max.   :8532.0  
+##  NA's   :14287       NA's   :15419   
+##                               comments    
+##  DO Probe bad - Doesn't go to zero:  206  
+##  DO taken with Jones Lab Meter    :  162  
+##  NA's                             :38246  
+##                                           
+##                                           
+##                                           
+## 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.phys.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 38614    11
+\end{verbatim}
+
+\subsection{DATA WRANGLING}\label{data-wrangling}
+
+Data wrangling takes data exploration one step further: it allows you to
+process data in ways that are useful for you. An important part of data
+wrangling is creating tidy datasets, with the following rules:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Each variable has its own column
+\item
+  Each observation has its own row
+\item
+  Each value has its own cell
+\end{enumerate}
+
+What is the best way to wrangle data? There are multiple ways to arrive
+at a specific outcome in R, and we will illustrate some of those
+approaches. Your goal should be to write the simplest and most elegant
+code that will get you to your desired outcome. However, there is
+sometimes a trade-off of the opportunity cost to learn a new formulation
+of code and the time it takes to write complex code that you already
+know. Remember that the best code is one that is easy to understand for
+yourself and your collaborators. Remember to comment your code, use
+informative names for variables and functions, and use reproducible
+methods to arrive at your output.
+
+\subsection{WRANGLING IN R: DPLYR}\label{wrangling-in-r-dplyr}
+
+\texttt{dplyr} is a package in R that includes functions for data
+manipulation (i.e., data wrangling or data munging). \texttt{dplyr} is
+included in the tidyverse package, so you should already have it
+installed on your machine. The functions act as verbs for data wrangling
+processes. For more information, run this line of code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{vignette}\NormalTok{(}\StringTok{"dplyr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## starting httpd help server ... done
+\end{verbatim}
+
+\subsubsection{Filter}\label{filter}
+
+Filtering allows us to choose certain rows (observations) in our
+dataset.
+
+A few relevant commands: \texttt{==} \texttt{!=} \texttt{\textless{}}
+\texttt{\textless{}=} \texttt{\textgreater{}} \texttt{\textgreater{}=}
+\texttt{\&} \texttt{\textbar{}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(NTL.phys.data}\OperatorTok{$}\NormalTok{lakeid)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "factor"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(NTL.phys.data}\OperatorTok{$}\NormalTok{depth)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "numeric"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# matrix filtering}
+\NormalTok{NTL.phys.data.surface1 <-}\StringTok{ }\NormalTok{NTL.phys.data[NTL.phys.data}\OperatorTok{$}\NormalTok{depth }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{,]}
+
+\CommentTok{# dplyr filtering}
+\NormalTok{NTL.phys.data.surface2 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, depth }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{)}
+\NormalTok{NTL.phys.data.surface3 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, depth }\OperatorTok{<}\StringTok{ }\FloatTok{0.25}\NormalTok{)}
+
+\CommentTok{# Did the methods arrive at the same result?}
+\KeywordTok{head}\NormalTok{(NTL.phys.data.surface1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    lakeid     lakename year4 daynum sampledate depth temperature_C
+## 1       L    Paul Lake  1984    148    5/27/84     0          14.5
+## 18      R   Peter Lake  1984    149    5/28/84     0          14.8
+## 40      T Tuesday Lake  1984    150    5/29/84     0          15.0
+## 56      L    Paul Lake  1984    155     6/3/84     0          18.8
+## 72      R   Peter Lake  1984    156     6/4/84     0          18.8
+## 90      T Tuesday Lake  1984    157     6/5/84     0          21.0
+##    dissolvedOxygen irradianceWater irradianceDeck comments
+## 1              9.5            1750           1620     <NA>
+## 18             9.2            1630           1540     <NA>
+## 40             9.5            1850           1960     <NA>
+## 56             8.0            1100           1050     <NA>
+## 72             9.0             275            275     <NA>
+## 90             8.4            1200           1200     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.phys.data.surface1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1902   11
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(NTL.phys.data.surface2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid     lakename year4 daynum sampledate depth temperature_C
+## 1      L    Paul Lake  1984    148    5/27/84     0          14.5
+## 2      R   Peter Lake  1984    149    5/28/84     0          14.8
+## 3      T Tuesday Lake  1984    150    5/29/84     0          15.0
+## 4      L    Paul Lake  1984    155     6/3/84     0          18.8
+## 5      R   Peter Lake  1984    156     6/4/84     0          18.8
+## 6      T Tuesday Lake  1984    157     6/5/84     0          21.0
+##   dissolvedOxygen irradianceWater irradianceDeck comments
+## 1             9.5            1750           1620     <NA>
+## 2             9.2            1630           1540     <NA>
+## 3             9.5            1850           1960     <NA>
+## 4             8.0            1100           1050     <NA>
+## 5             9.0             275            275     <NA>
+## 6             8.4            1200           1200     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.phys.data.surface2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1902   11
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(NTL.phys.data.surface3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid     lakename year4 daynum sampledate depth temperature_C
+## 1      L    Paul Lake  1984    148    5/27/84     0          14.5
+## 2      R   Peter Lake  1984    149    5/28/84     0          14.8
+## 3      T Tuesday Lake  1984    150    5/29/84     0          15.0
+## 4      L    Paul Lake  1984    155     6/3/84     0          18.8
+## 5      R   Peter Lake  1984    156     6/4/84     0          18.8
+## 6      T Tuesday Lake  1984    157     6/5/84     0          21.0
+##   dissolvedOxygen irradianceWater irradianceDeck comments
+## 1             9.5            1750           1620     <NA>
+## 2             9.2            1630           1540     <NA>
+## 3             9.5            1850           1960     <NA>
+## 4             8.0            1100           1050     <NA>
+## 5             9.0             275            275     <NA>
+## 6             8.4            1200           1200     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.phys.data.surface3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1902   11
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# MAtrix keep the row number. dplyr changes the row numbers}
+
+
+\CommentTok{# Choose multiple conditions to filter}
+\KeywordTok{summary}\NormalTok{(NTL.phys.data}\OperatorTok{$}\NormalTok{lakename)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Central Long Lake     Crampton Lake    East Long Lake  Hummingbird Lake 
+##               539              1234              3905               430 
+##         Paul Lake        Peter Lake      Tuesday Lake         Ward Lake 
+##             10325             11288              6107               598 
+##    West Long Lake 
+##              4188
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.PeterPaul1 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, lakename }\OperatorTok{==}\StringTok{ "Paul Lake"} \OperatorTok{|}\StringTok{ }\NormalTok{lakename }\OperatorTok{==}\StringTok{ "Peter Lake"}\NormalTok{)}
+\NormalTok{NTL.phys.data.PeterPaul2 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, lakename }\OperatorTok{!=}\StringTok{ "Central Long Lake"} \OperatorTok{&}\StringTok{ }
+\StringTok{                                     }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "Crampton Lake"} \OperatorTok{&}\StringTok{ }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "East Long Lake"} \OperatorTok{&}
+\StringTok{                                     }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "Hummingbird Lake"} \OperatorTok{&}\StringTok{ }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "Tuesday Lake"} \OperatorTok{&}
+\StringTok{                                     }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "Ward Lake"} \OperatorTok{&}\StringTok{ }\NormalTok{lakename }\OperatorTok{!=}\StringTok{ "West Long Lake"}\NormalTok{)}
+\NormalTok{NTL.phys.data.PeterPaul3 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, lakename }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Paul Lake"}\NormalTok{, }\StringTok{"Peter Lake"}\NormalTok{))}
+\CommentTok{# %in% means include.}
+
+
+\CommentTok{# Choose a range of conditions of a numeric or integer variable}
+\KeywordTok{summary}\NormalTok{(NTL.phys.data}\OperatorTok{$}\NormalTok{daynum)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    55.0   166.0   194.0   194.3   222.0   307.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.JunethruOctober1 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, daynum }\OperatorTok{>}\StringTok{ }\DecValTok{151} \OperatorTok{&}\StringTok{ }\NormalTok{daynum }\OperatorTok{<}\StringTok{ }\DecValTok{305}\NormalTok{)}
+\NormalTok{NTL.phys.data.JunethruOctober2 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, daynum }\OperatorTok{>}\StringTok{ }\DecValTok{151}\NormalTok{, daynum }\OperatorTok{<}\StringTok{ }\DecValTok{305}\NormalTok{) }\CommentTok{# , is equal to and}
+\NormalTok{NTL.phys.data.JunethruOctober3 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, daynum }\OperatorTok{>=}\StringTok{ }\DecValTok{152} \OperatorTok{&}\StringTok{ }\NormalTok{daynum }\OperatorTok{<=}\StringTok{ }\DecValTok{304}\NormalTok{)}
+\NormalTok{NTL.phys.data.JunethruOctober4 <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, daynum }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{152}\OperatorTok{:}\DecValTok{304}\NormalTok{)) }\CommentTok{# 152 and 304 are included}
+
+\CommentTok{# Exercise: }
+\CommentTok{# filter NTL.phys.data for the year 1999}
+\NormalTok{NTL.phys.data.}\DecValTok{1999}\NormalTok{ <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, year4 }\OperatorTok{==}\StringTok{ }\DecValTok{1999}\NormalTok{)}
+\CommentTok{# what code do you need to use, based on the class of the variable? Factor "", numbers alone}
+\KeywordTok{class}\NormalTok{(NTL.phys.data}\OperatorTok{$}\NormalTok{year4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "integer"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Exercise: }
+\CommentTok{# filter NTL.phys.data for Tuesday Lake from 1990 through 1999.}
+\NormalTok{NTL.phys.data.}\DecValTok{19901999}\NormalTok{ <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.phys.data, lakename }\OperatorTok{==}\StringTok{ "Tuesday Lake"}\NormalTok{, year4 }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1990}\OperatorTok{:}\DecValTok{1999}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Question: Why don't we filter using row numbers?
+
+\begin{quote}
+ANSWER: Not reprodusable. Not very efficient. You have to look what you
+want to do. MAybe in an actualization of the raw data the rows change.
+\end{quote}
+
+\subsubsection{Arrange}\label{arrange}
+
+Arranging allows us to change the order of rows in our dataset. By
+default, the arrange function will arrange rows in ascending order.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.depth.ascending <-}\StringTok{ }\KeywordTok{arrange}\NormalTok{(NTL.phys.data, depth)}
+\NormalTok{NTL.phys.data.depth.descending <-}\StringTok{ }\KeywordTok{arrange}\NormalTok{(NTL.phys.data, }\KeywordTok{desc}\NormalTok{(depth))}
+
+\CommentTok{# Exercise: }
+\CommentTok{# Arrange NTL.phys.data by temperature, in descending order. }
+\NormalTok{NTL.phys.data.temperature.descending <-}\StringTok{ }\KeywordTok{arrange}\NormalTok{(NTL.phys.data, }\KeywordTok{desc}\NormalTok{(temperature_C))}
+\CommentTok{# Which dates, lakes, and depths have the highest temperatures?}
+\KeywordTok{head}\NormalTok{(NTL.phys.data.temperature.descending)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid         lakename year4 daynum sampledate depth temperature_C
+## 1      E   East Long Lake  1998    197    7/16/98   0.5          34.1
+## 2      H Hummingbird Lake  2002    182     7/1/02   0.0          31.5
+## 3      H Hummingbird Lake  2002    200    7/19/02   0.0          29.0
+## 4      E   East Long Lake  1995    170    6/19/95   0.0          28.5
+## 5      H Hummingbird Lake  2002    182     7/1/02   0.5          28.5
+## 6      E   East Long Lake  1995    170    6/19/95   0.5          28.3
+##   dissolvedOxygen irradianceWater irradianceDeck comments
+## 1             7.5              69            395     <NA>
+## 2             6.6              NA             NA     <NA>
+## 3             7.4              NA             NA     <NA>
+## 4             7.7             996           1095     <NA>
+## 5             6.1              NA             NA     <NA>
+## 6             7.7             153           1032     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Summer months, East Long Lake, Hummingbird Lake; 0.5 and 1}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Select}\label{select}
+
+\section{for columns. filter was for
+rows.}\label{for-columns.-filter-was-for-rows.}
+
+Selecting allows us to choose certain columns (variables) in our
+dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.temps <-}\StringTok{ }\KeywordTok{select}\NormalTok{(NTL.phys.data, lakename, sampledate}\OperatorTok{:}\NormalTok{temperature_C) }\CommentTok{# use comas (and) and colons (through). Doesnt work with & for example}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Mutate}\label{mutate}
+
+Mutating allows us to add new columns that are functions of existing
+columns. Operations include addition, subtraction, multiplication,
+division, log, and other functions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.temps <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(NTL.phys.data.temps, }\DataTypeTok{temperature_F =}\NormalTok{ (temperature_C}\OperatorTok{*}\DecValTok{9}\OperatorTok{/}\DecValTok{5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\DecValTok{32}\NormalTok{)}
+\CommentTok{# the column goes always at the very end. NAs are kept.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Pipes}\label{pipes}
+
+Sometimes we will want to perform multiple commands on a single dataset
+on our way to creating a processed dataset. We could do this in a series
+of subsequent commands or create a function. However, there is another
+method to do this that looks cleaner and is easier to read. This method
+is called a pipe. We designate a pipe with \texttt{\%\textgreater{}\%}.
+A good way to think about the function of a pipe is with the word
+``then.''
+
+Let's say we want to take our raw dataset (NTL.phys.data), \emph{then}
+filter the data for Peter and Paul lakes, \emph{then} select temperature
+and observation information, and \emph{then} add a column for
+temperature in Fahrenheit:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.processed <-}\StringTok{ }
+\StringTok{  }\NormalTok{NTL.phys.data }\OperatorTok{%>%}\StringTok{ }\CommentTok{#then   #you declare the data frame one time }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(lakename }\OperatorTok{==}\StringTok{ "Paul Lake"} \OperatorTok{|}\StringTok{ }\NormalTok{lakename }\OperatorTok{==}\StringTok{ "Peter Lake"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{#then}
+\StringTok{  }\KeywordTok{select}\NormalTok{(lakename, sampledate}\OperatorTok{:}\NormalTok{temperature_C) }\OperatorTok{%>%}\StringTok{ }\CommentTok{#then}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{temperature_F =}\NormalTok{ (temperature_C}\OperatorTok{*}\DecValTok{9}\OperatorTok{/}\DecValTok{5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\DecValTok{32}\NormalTok{)}
+\CommentTok{# might replace a for loop}
+\end{Highlighting}
+\end{Shaded}
+
+Notice that we did not place the dataset name inside the wrangling
+function but rather at the beginning.
+
+\subsubsection{Saving processed
+datasets}\label{saving-processed-datasets}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{write.csv}\NormalTok{(NTL.phys.data.PeterPaul1, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{file =}    
+\StringTok{"./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv"}\NormalTok{)}
+\CommentTok{#row.names TRUE creates a row number column}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{CLOSING DISCUSSION}\label{closing-discussion}
+
+How did data wrangling help us to generate a processed dataset? How does
+this impact our ability to analyze and answer questions about our data?
+
+
+\end{document}

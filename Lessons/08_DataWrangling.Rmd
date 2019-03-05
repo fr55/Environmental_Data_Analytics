@@ -73,8 +73,8 @@ However, there may be situations where we want to reshape our dataset, for examp
 
 ```{r}
 # Gather nutrient data into one column
-NTL.nutrient.data.PeterPaul.gathered <- gather(NTL.nutrient.data.PeterPaul.skinny, "nutrient", "concentration", tn_ug:po4) # function gather and spread. we define new columns and gather existing ones
-count(NTL.nutrient.data.PeterPaul.gathered, nutrient). # gets the bigger number and fills with NAs
+NTL.nutrient.data.PeterPaul.gathered <- gather(NTL.nutrient.data.PeterPaul.skinny, "nutrient", "concentration", tn_ug:po4) # function gather and spread. we define new #columns and gather existing ones
+count(NTL.nutrient.data.PeterPaul.gathered, nutrient) # gets the bigger number and fills with NAs
 NTL.nutrient.data.PeterPaul.gathered <- subset(NTL.nutrient.data.PeterPaul.gathered, !is.na(concentration))
 count(NTL.nutrient.data.PeterPaul.gathered, nutrient) # eliminates the NAs
 

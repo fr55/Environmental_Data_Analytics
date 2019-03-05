@@ -1,0 +1,621 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={8: Data Wrangling},
+            pdfauthor={Environmental Data Analytics \textbar{} Kateri Salk},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{8: Data Wrangling}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Environmental Data Analytics \textbar{} Kateri Salk}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Spring 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{LESSON OBJECTIVES}\label{lesson-objectives}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the usefulness of data wrangling and its place in the data
+  pipeline
+\item
+  Wrangle datasets with dplyr functions
+\item
+  Apply data wrangling skills to a real-world example dataset
+\end{enumerate}
+
+\subsection{SET UP YOUR DATA ANALYSIS
+SESSION}\label{set-up-your-data-analysis-session}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{getwd}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages ---------------------------------------------------- tidyverse 1.2.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.0.0     v purrr   0.2.5
+## v tibble  1.4.2     v dplyr   0.7.6
+## v tidyr   0.8.1     v stringr 1.3.1
+## v readr   1.1.1     v forcats 0.3.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.data.PeterPaul <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv"}\NormalTok{)}
+\NormalTok{NTL.nutrient.data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{REVIEW OF BASIC DATA EXPLORATION AND
+WRANGLING}\label{review-of-basic-data-exploration-and-wrangling}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Data summaries for physical data}
+\KeywordTok{head}\NormalTok{(NTL.phys.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid  lakename year4 daynum sampledate depth temperature_C
+## 1      L Paul Lake  1984    148    5/27/84  0.00          14.5
+## 2      L Paul Lake  1984    148    5/27/84  0.25            NA
+## 3      L Paul Lake  1984    148    5/27/84  0.50            NA
+## 4      L Paul Lake  1984    148    5/27/84  0.75            NA
+## 5      L Paul Lake  1984    148    5/27/84  1.00          14.5
+## 6      L Paul Lake  1984    148    5/27/84  1.50            NA
+##   dissolvedOxygen irradianceWater irradianceDeck comments
+## 1             9.5            1750           1620     <NA>
+## 2              NA            1550           1620     <NA>
+## 3              NA            1150           1620     <NA>
+## 4              NA             975           1620     <NA>
+## 5             8.8             870           1620     <NA>
+## 6              NA             610           1620     <NA>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{colnames}\NormalTok{(NTL.phys.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "lakeid"          "lakename"        "year4"          
+##  [4] "daynum"          "sampledate"      "depth"          
+##  [7] "temperature_C"   "dissolvedOxygen" "irradianceWater"
+## [10] "irradianceDeck"  "comments"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.phys.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 21613    11
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(NTL.phys.data.PeterPaul}\OperatorTok{$}\NormalTok{comments)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## DO Probe bad - Doesn't go to zero     DO taken with Jones Lab Meter 
+##                               132                               112 
+##                              NA's 
+##                             21369
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(NTL.phys.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate) }\CommentTok{# CSV doesnt keep format info}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "factor"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Format sampledate as date}
+\NormalTok{NTL.phys.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate <-}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(NTL.phys.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate, }\DataTypeTok{format =} \StringTok{"%m/%d/%y"}\NormalTok{)}
+
+\CommentTok{# Select Peter and Paul Lakes from the nutrient dataset}
+\NormalTok{NTL.nutrient.data.PeterPaul <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(NTL.nutrient.data, lakename }\OperatorTok{==}\StringTok{ "Paul Lake"} \OperatorTok{|}\StringTok{ }\NormalTok{lakename }\OperatorTok{==}\StringTok{ "Peter Lake"}\NormalTok{) }\CommentTok{#filter rows, select colums. | = to or.}
+
+\CommentTok{# Data summaries for nutrient data}
+\KeywordTok{head}\NormalTok{(NTL.nutrient.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   lakeid  lakename year4 daynum sampledate depth_id depth tn_ug tp_ug nh34
+## 1      L Paul Lake  1991    140    5/20/91        1  0.00   538    25   NA
+## 2      L Paul Lake  1991    140    5/20/91        2  0.85   285    14   NA
+## 3      L Paul Lake  1991    140    5/20/91        3  1.75   399    14   NA
+## 4      L Paul Lake  1991    140    5/20/91        4  3.00   453    14   NA
+## 5      L Paul Lake  1991    140    5/20/91        5  4.00   363    13   NA
+## 6      L Paul Lake  1991    140    5/20/91        6  6.00   583    37   NA
+##   no23 po4 comments
+## 1   NA  NA         
+## 2   NA  NA         
+## 3   NA  NA         
+## 4   NA  NA         
+## 5   NA  NA         
+## 6   NA  NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{colnames}\NormalTok{(NTL.nutrient.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "lakeid"     "lakename"   "year4"      "daynum"     "sampledate"
+##  [6] "depth_id"   "depth"      "tn_ug"      "tp_ug"      "nh34"      
+## [11] "no23"       "po4"        "comments"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(NTL.nutrient.data.PeterPaul)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2770   13
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{comments) }\CommentTok{# the 0 comments are comments that exist for other lakes.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                                sample missing 
+##                           2770                              0 
+## TP value suspect, far too high 
+##                              0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{comments) }\CommentTok{# is a factor. doesn not fill it with NAs.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "factor"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{(NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "factor"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate <-}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate, }\DataTypeTok{format =} \StringTok{"%m/%d/%y"}\NormalTok{)}
+
+\KeywordTok{summary}\NormalTok{(NTL.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{lakename) }\CommentTok{# shows all lakes. there is a droplevel that shows only the lakes in the data set.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Bergner Lake            Bog Pot         Bolger Bog 
+##                  0                  0                  0 
+##         Brown Lake  Central Long Lake      Crampton Lake 
+##                  0                  0                  0 
+##      Cranberry Bog     East Long Lake            Eds Bog 
+##                  0                  0                  0 
+## Forest Service Bog   Hummingbird Lake        Inkpot Lake 
+##                  0                  0                  0 
+##      Kickapoo Lake        Morris Lake     North Gate Bog 
+##                  0                  0                  0 
+##          Paul Lake         Peter Lake          Plum Lake 
+##               1383               1387                  0 
+##     Raspberry Lake    Reddington Lake         Roach Lake 
+##                  0                  0                  0 
+##         Tender Bog    Tenderfoot Lake       Tuesday Lake 
+##                  0                  0                  0 
+##          Ward Lake     West Long Lake 
+##                  0                  0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Save processed nutrient file}
+\KeywordTok{write.csv}\NormalTok{(NTL.nutrient.data.PeterPaul, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{file =} \StringTok{"./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv"}\NormalTok{)}
+
+\CommentTok{# Remove columns that are not of interest for analysis}
+\NormalTok{NTL.phys.data.PeterPaul.skinny <-}\StringTok{ }\KeywordTok{select}\NormalTok{(NTL.phys.data.PeterPaul, }
+\NormalTok{                                         lakename, daynum, year4, sampledate}\OperatorTok{:}\NormalTok{irradianceDeck)}
+  
+\NormalTok{NTL.nutrient.data.PeterPaul.skinny <-}\StringTok{ }\KeywordTok{select}\NormalTok{(NTL.nutrient.data.PeterPaul, }
+\NormalTok{                                             lakename, daynum, year4, sampledate, depth}\OperatorTok{:}\NormalTok{po4)   }\CommentTok{# to remove we put a - sign (only for select). filter is different}
+\end{Highlighting}
+\end{Shaded}
+
+\section{up to here is data
+wrangling}\label{up-to-here-is-data-wrangling}
+
+\subsection{TIDY DATASETS}\label{tidy-datasets}
+
+For most situations, data analysis works best when you have organized
+your data into a tidy dataset. A tidy dataset is defined as:
+
+\begin{itemize}
+\tightlist
+\item
+  Each variable is a column
+\item
+  Each row is an observation (e.g., sampling event from a specific date
+  and/or location)
+\item
+  Each value is in its own cell
+\end{itemize}
+
+However, there may be situations where we want to reshape our dataset,
+for example if we want to facet numerical data points by measurement
+type (more on this in the data visualization unit). We can program this
+reshaping in a few short lines of code using the package \texttt{tidyr},
+which is conveniently included in the \texttt{tidyverse} package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Gather nutrient data into one column}
+\NormalTok{NTL.nutrient.data.PeterPaul.gathered <-}\StringTok{ }\KeywordTok{gather}\NormalTok{(NTL.nutrient.data.PeterPaul.skinny, }\StringTok{"nutrient"}\NormalTok{, }\StringTok{"concentration"}\NormalTok{, tn_ug}\OperatorTok{:}\NormalTok{po4) }\CommentTok{# function gather and spread. we define new #columns and gather existing ones}
+\KeywordTok{count}\NormalTok{(NTL.nutrient.data.PeterPaul.gathered, nutrient) }\CommentTok{# gets the bigger number and fills with NAs}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 2
+##   nutrient     n
+##   <chr>    <int>
+## 1 nh34      2770
+## 2 no23      2770
+## 3 po4       2770
+## 4 tn_ug     2770
+## 5 tp_ug     2770
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.nutrient.data.PeterPaul.gathered <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(NTL.nutrient.data.PeterPaul.gathered, }\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(concentration))}
+\KeywordTok{count}\NormalTok{(NTL.nutrient.data.PeterPaul.gathered, nutrient) }\CommentTok{# eliminates the NAs}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 2
+##   nutrient     n
+##   <chr>    <int>
+## 1 nh34      1204
+## 2 no23      1235
+## 3 po4       1246
+## 4 tn_ug     1729
+## 5 tp_ug     2583
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{write.csv}\NormalTok{(NTL.nutrient.data.PeterPaul.gathered, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
+          \DataTypeTok{file =}\StringTok{"./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv"}\NormalTok{)}
+
+\CommentTok{# Spread nutrient data into separate columns   # opposite of gather}
+\NormalTok{NTL.nutrient.data.PeterPaul.spread <-}\StringTok{ }\KeywordTok{spread}\NormalTok{(NTL.nutrient.data.PeterPaul.gathered, nutrient, concentration) }\CommentTok{# two values missing. must be 2 rows with only NAs.}
+
+\CommentTok{# Split components of cells into multiple columns}
+\CommentTok{# Opposite of 'separate' is 'unite'}
+\NormalTok{NTL.nutrient.data.PeterPaul.dates <-}\StringTok{ }\KeywordTok{separate}\NormalTok{(NTL.nutrient.data.PeterPaul.skinny, sampledate, }\KeywordTok{c}\NormalTok{(}\StringTok{"Y"}\NormalTok{, }\StringTok{"m"}\NormalTok{, }\StringTok{"d"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{JOINING MULTIPLE DATASETS}\label{joining-multiple-datasets}
+
+In many cases, we will want to combine datasets into one dataset. If all
+column names match, the data frames can be combined with the
+\texttt{rbind} function. If some column names match and some column
+names don't match, we can combine the data frames using a ``join''
+function according to common conditions that exist in the matching
+columns. We will demonstrate this with the NTL-LTER physical and
+nutrient datasets, where we have specific instances when physical and
+nutrient data were collected on the same date, at the same lake, and at
+the same depth.
+
+In dplyr, there are several types of join functions:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{inner\_join}: return rows in x where there are matching values
+  in y, and all columns in x and y (mutating join).
+\item
+  \texttt{semi\_join}: return all rows from x where there are matching
+  values in y, keeping just columns from x (filtering join).
+\item
+  \texttt{left\_join}: return all rows from x, and all columns from x
+  and y (mutating join).
+\item
+  \texttt{anti\_join}: return all rows from x where there are \emph{not}
+  matching values in y, keeping just columns from x (filtering join).
+\item
+  \texttt{full\_join}: return all rows and all columns from x and y.
+  Returns NA for missing values (mutating join).
+\end{itemize}
+
+Let's say we want to generate a new dataset that contains all possible
+physical and chemical data for Peter and Paul Lakes. In this case, we
+want to do a full join.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.phys.nutrient.data.PeterPaul <-}\StringTok{ }\KeywordTok{full_join}\NormalTok{(NTL.phys.data.PeterPaul.skinny, NTL.nutrient.data.PeterPaul.skinny)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Joining, by = c("lakename", "daynum", "year4", "sampledate", "depth")
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Column `lakename` joining factors with different levels, coercing
+## to character vector
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{write.csv}\NormalTok{(NTL.phys.nutrient.data.PeterPaul, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
+          \DataTypeTok{file =}\StringTok{"./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"}\NormalTok{)}
+\CommentTok{# warning: switching to factor}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{LUBRIDATE}\label{lubridate}
+
+A package that makes coercing date much easier is \texttt{lubridate}. A
+guide to the package can be found at
+\url{https://lubridate.tidyverse.org/}. The cheat sheet within that web
+page is excellent too. This package can do many things (hint: look into
+this package if you are having unique date-type issues), but today we
+will be using two of its functions for our NTL dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#install.packages("lubridate")}
+\KeywordTok{library}\NormalTok{(lubridate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:base':
+## 
+##     date
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# add a month column to the dataset}
+\NormalTok{NTL.phys.nutrient.data.PeterPaul <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(NTL.phys.nutrient.data.PeterPaul, }\DataTypeTok{month =} \KeywordTok{month}\NormalTok{(sampledate)) }
+
+\CommentTok{# reorder columns to put month with the rest of the date variables}
+\NormalTok{NTL.phys.nutrient.data.PeterPaul <-}\StringTok{ }\KeywordTok{select}\NormalTok{(NTL.phys.nutrient.data.PeterPaul, lakename, year4, month, sampledate}\OperatorTok{:}\NormalTok{po4)}
+
+\CommentTok{# find out the start and end dates of the dataset}
+\KeywordTok{interval}\NormalTok{(NTL.phys.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate[}\DecValTok{1}\NormalTok{], NTL.phys.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate[}\DecValTok{23372}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1984-05-27 UTC--2014-08-29 UTC
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{interval}\NormalTok{(}\KeywordTok{first}\NormalTok{(NTL.phys.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate), }\KeywordTok{last}\NormalTok{(NTL.phys.nutrient.data.PeterPaul}\OperatorTok{$}\NormalTok{sampledate)) }\CommentTok{#more reprodusable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1984-05-27 UTC--2014-08-29 UTC
+\end{verbatim}
+
+\subsection{SPLIT-APPLY-COMBINE}\label{split-apply-combine}
+
+dplyr functionality, combined with the pipes operator, allows us to
+split datasets according to groupings (function: \texttt{group\_by}),
+then run operations on those groupings and return the output of those
+operations. There is a lot of flexibility in this approach, but we will
+illustrate just one example today.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NTL.PeterPaul.summaries <-}\StringTok{ }
+\StringTok{  }\NormalTok{NTL.phys.nutrient.data.PeterPaul }\OperatorTok{%>%}\StringTok{ }\CommentTok{#then}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(depth }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(lakename) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(temperature_C) }\OperatorTok{&}\StringTok{ }\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(tn_ug) }\OperatorTok{&}\StringTok{ }\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(tp_ug)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{#wthout nas}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{meantemp =} \KeywordTok{mean}\NormalTok{(temperature_C), }\CommentTok{#by group}
+            \DataTypeTok{sdtemp =} \KeywordTok{sd}\NormalTok{(temperature_C), }
+            \DataTypeTok{meanTN =} \KeywordTok{mean}\NormalTok{(tn_ug), }
+            \DataTypeTok{sdTN =} \KeywordTok{sd}\NormalTok{(tn_ug), }
+            \DataTypeTok{meanTP =} \KeywordTok{mean}\NormalTok{(tp_ug), }
+            \DataTypeTok{sdTP =} \KeywordTok{sd}\NormalTok{(tp_ug))}
+
+\KeywordTok{write.csv}\NormalTok{(NTL.PeterPaul.summaries, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
+          \DataTypeTok{file =}\StringTok{"./Data/Processed/NTL-LTER_Lake_Summaries_PeterPaul_Processed.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{ALTERNATIVE METHODS FOR DATA
+WRANGLING}\label{alternative-methods-for-data-wrangling}
+
+If you want to iteratively perform operations on your data, there exist
+several options. We have demonstrated the pipe as one option. Additional
+options include the \texttt{apply} function
+(\url{https://www.rdocumentation.org/packages/base/versions/3.5.2/topics/apply})
+and \texttt{for} loops
+(\url{https://swcarpentry.github.io/r-novice-inflammation/15-supp-loops-in-depth/}).
+These options are good options as well (again, multiple ways to get to
+the same outcome). A word of caution: loops are slow. This may not make
+a difference for small datasets, but small time additions will make a
+difference with large datasets.
+
+
+\end{document}

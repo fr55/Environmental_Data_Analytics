@@ -297,7 +297,7 @@ Scatterplot}\label{plotting-continuous-variables-over-time-scatterplot}
 \NormalTok{PMplot.faceted <-}
 \StringTok{  }\KeywordTok{ggplot}\NormalTok{(EPAair, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Month, }\DataTypeTok{y =}\NormalTok{ PM25, }\DataTypeTok{shape =} \KeywordTok{as.factor}\NormalTok{(Year))) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{facet_wrap}\NormalTok{(}\KeywordTok{vars}\NormalTok{(Site.Name), }\DataTypeTok{nrow =} \DecValTok{3}\NormalTok{) }\CommentTok{#new layer. three rows. three graphs. if not default is columns.}
+\StringTok{  }\KeywordTok{facet_wrap}\NormalTok{(}\KeywordTok{vars}\NormalTok{(Site.Name)) }\CommentTok{#new layer. three rows. three graphs. if not default is columns.}
 \KeywordTok{print}\NormalTok{(PMplot.faceted)}
 \end{Highlighting}
 \end{Shaded}

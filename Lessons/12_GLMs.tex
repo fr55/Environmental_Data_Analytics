@@ -1,0 +1,768 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={11: Generalized Linear Models},
+            pdfauthor={Environmental Data Analytics \textbar{} Kateri Salk},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{11: Generalized Linear Models}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Environmental Data Analytics \textbar{} Kateri Salk}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Spring 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{LESSON OBJECTIVES}\label{lesson-objectives}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the components of the generalized linear model (GLM)
+\item
+  Apply special cases of the GLM to real datasets
+\item
+  Interpret and report the results of GLMs in publication-style formats
+\end{enumerate}
+
+\section{y = alpha + Betha x + error}\label{y-alpha-betha-x-error}
+
+\subsection{SET UP YOUR DATA ANALYSIS
+SESSION}\label{set-up-your-data-analysis-session}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{getwd}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+
+\NormalTok{PeterPaul.chem.nutrients <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"}\NormalTok{)}
+
+\CommentTok{# Set date to date format}
+\NormalTok{PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{sampledate <-}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{sampledate, }
+                                               \DataTypeTok{format =} \StringTok{"%Y-%m-%d"}\NormalTok{)}
+
+\NormalTok{mytheme <-}\StringTok{ }\KeywordTok{theme_classic}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color =} \StringTok{"black"}\NormalTok{), }
+        \DataTypeTok{legend.position =} \StringTok{"top"}\NormalTok{)}
+\KeywordTok{theme_set}\NormalTok{(mytheme)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{SIMPLE AND MULTIPLE LINEAR REGRESSION (line of best fit,
+continous
+data)}\label{simple-and-multiple-linear-regression-line-of-best-fit-continous-data}
+
+The linear regression, like the t-test and ANOVA, is a special case of
+the \textbf{generalized linear model} (GLM). A linear regression is
+comprised of a continuous response variable, plus a combination of 1+
+continuous response variables (plus the error term). The deterministic
+portion of the equation describes the response variable as lying on a
+straight line, with an intercept and a slope term. The equation is thus
+a typical algebraic expression: \[ y = \alpha + \beta*x + \epsilon \]
+
+The goal for the linear regression is to find a \textbf{line of best
+fit}, which is the line drawn through the bivariate space that minimizes
+the total distance of points from the line. This is also called a
+``least squares'' regression. The remainder of the variance not
+explained by the model is called the \textbf{residual error.}
+
+The linear regression will test the null hypotheses that
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The intercept (alpha) is equal to zero.
+\item
+  The slope (beta) is equal to zero
+\end{enumerate}
+
+Whether or not we care about the result of each of these tested
+hypotheses will depend on our research question. Sometimes, the test for
+the intercept will be of interest, and sometimes it will not.
+
+Important components of the linear regression are the correlation and
+the R-squared value. The \textbf{correlation} is a number between -1 and
+1, describing the relationship between the variables. Correlations close
+to -1 represent strong negative correlations, correlations close to zero
+represent weak correlations, and correlations close to 1 represent
+strong positive correlations. The \textbf{R-squared value} is the
+correlation squared, becoming a number between 0 and 1. The R-squared
+value describes the percent of variance accounted for by the explanatory
+variables.
+
+\subsubsection{Simple Linear Regression}\label{simple-linear-regression}
+
+For the NTL-LTER dataset, can we predict irradiance (light level) from
+depth?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{irradiance.regression <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{irradianceWater }\OperatorTok{~}\StringTok{ }\NormalTok{PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{depth)}
+\CommentTok{# another way to format the lm function}
+\NormalTok{irradiance.regression <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, irradianceWater }\OperatorTok{~}\StringTok{ }\NormalTok{depth)}
+\KeywordTok{summary}\NormalTok{(irradiance.regression)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = irradianceWater ~ depth, data = PeterPaul.chem.nutrients)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+##  -458.9  -144.1   -41.2    90.3 23813.0 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  486.818      4.063  119.82   <2e-16 ***
+## depth        -95.890      1.153  -83.14   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 303.4 on 15449 degrees of freedom
+##   (7921 observations deleted due to missingness)
+## Multiple R-squared:  0.3091, Adjusted R-squared:  0.3091 
+## F-statistic:  6912 on 1 and 15449 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#output telling us: irradiance = 486.818(signif) - 95.89*depth + error (high error, only explaining 30% of the response) R.squared penalises you if you use more explanatory variable}
+
+\CommentTok{# Correlation (R value. you know the directionality)}
+\KeywordTok{cor.test}\NormalTok{(PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{irradianceWater, PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{depth)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Pearson's product-moment correlation
+## 
+## data:  PeterPaul.chem.nutrients$irradianceWater and PeterPaul.chem.nutrients$depth
+## t = -83.137, df = 15449, p-value < 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.5667674 -0.5449776
+## sample estimates:
+##       cor 
+## -0.555968
+\end{verbatim}
+
+Question: How would you report the results of this test (overall
+findings and report of statistical output)?
+
+\begin{quote}
+ANSWER: significant negative correlation between irradiance and depth
+(lower light levels at greater depths), and that this model explains
+about 31 \% of the total variance in irradiance (linear regression, R2 =
+0.31, df = 15449, p \textless{} 0.0001(the depth p value in this case)).
+We dont use the Fstatistic. We use it only for ANOVA. If is part of your
+question you can report the pvalue of the intersept.
+\end{quote}
+
+So, we see there is a significant negative correlation between
+irradiance and depth (lower light levels at greater depths), and that
+this model explains about 31 \% of the total variance in irradiance.
+Let's visualize this relationship and the model itself.
+
+An exploratory option to visualize the model fit is to use the function
+\texttt{plot}. This function will return four graphs, which are intended
+only for checking the fit of the model and not for communicating
+results. The plots that are returned are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Residuals vs.~Fitted.} The value predicted by the line of best
+  fit is the fitted value, and the residual is the distance of that
+  actual value from the predicted value. By definition, there will be a
+  balance of positive and negative residuals. Watch for drastic
+  asymmetry from side to side or a marked departure from zero for the
+  red line - these are signs of a poor model fit.
+\item
+  \textbf{Normal Q-Q.} The points should fall close to the 1:1 line. We
+  often see departures from 1:1 at the high and low ends of the dataset,
+  which could be outliers.
+\item
+  \textbf{Scale-Location.} Similar to the residuals vs.~fitted graph,
+  this will graph the squared standardized residuals by the fitted
+  values.
+\item
+  \textbf{Residuals vs.~Leverage.} This graph will display potential
+  outliers. The values that fall outside the dashed red lines (Cook's
+  distance) are outliers for the model. Watch for drastic departures of
+  the solid red line from horizontal - this is a sign of a poor model
+  fit.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(irradiance.regression) }\CommentTok{#gives diff plots}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-3-1.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-3-2.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-3-3.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-3-4.pdf}
+
+The option best suited for communicating findings is to plot the
+explanatory and response variables as a scatterplot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Plot the regression}
+\NormalTok{irradiancebydepth <-}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ irradianceWater)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{2000}\NormalTok{) }\OperatorTok{+}\StringTok{ }\CommentTok{#remove the outlier for plotting}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }
+\KeywordTok{print}\NormalTok{(irradiancebydepth) }\CommentTok{# doesnt look linear. not good using linear regression. maybe logtransform.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 7922 rows containing missing values (geom_point).
+\end{verbatim}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+Given the distribution of irradiance values, we don't have a linear
+relationship between x and y in this case. Let's try log-transforming
+the irradiance values.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PeterPaul.chem.nutrients <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(PeterPaul.chem.nutrients, irradianceWater }\OperatorTok{!=}\StringTok{ }\DecValTok{0}\NormalTok{)}
+\NormalTok{irradiance.regression2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, }\KeywordTok{log}\NormalTok{(irradianceWater) }\OperatorTok{~}\StringTok{ }\NormalTok{depth) }\CommentTok{# we remove the 0 to be able to log  transform. they are only 3 values. not so concerned on loosing the data. to few.}
+\KeywordTok{summary}\NormalTok{(irradiance.regression2) }\CommentTok{#log(irradiance) = 6.2 - 0.74(depth) + error. better r2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(irradianceWater) ~ depth, data = PeterPaul.chem.nutrients)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9425 -0.5745  0.1931  0.7211  7.8571 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  6.219027   0.012916   481.5   <2e-16 ***
+## depth       -0.740261   0.003668  -201.8   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9643 on 15446 degrees of freedom
+## Multiple R-squared:  0.7251, Adjusted R-squared:  0.7251 
+## F-statistic: 4.074e+04 on 1 and 15446 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(irradiance.regression2) }\CommentTok{# better plots. keep an eye on the edges.}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-2.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-3.pdf}
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Add a line and standard error for the linear regression}
+\NormalTok{irradiancebydepth2 <-}\StringTok{ }
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ irradianceWater)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_log10}\NormalTok{() }\OperatorTok{+}\StringTok{ }\CommentTok{#change the scale of the plot}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{) }
+\KeywordTok{print}\NormalTok{(irradiancebydepth2) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# SE can also be removed}
+\NormalTok{irradiancebydepth2 <-}\StringTok{ }
+\StringTok{    }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ irradianceWater)) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.2}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{scale_y_log10}\NormalTok{() }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{'lm'}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{color =} \StringTok{"black"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\CommentTok{#remove the variance from the line}
+\StringTok{    }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{10}\NormalTok{,}\DecValTok{12}\NormalTok{))  }\CommentTok{# number in x axis}
+  \KeywordTok{print}\NormalTok{(irradiancebydepth2)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-5-6.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Make the graph attractive}
+\CommentTok{#you can change the transparency (alpha). or an anotation layer.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Non-parametric equivalent: Spearman's
+Rho}\label{non-parametric-equivalent-spearmans-rho}
+
+As with the t-test and ANOVA, there is a nonparametric variant to the
+linear regression. The \textbf{Spearman's rho} test has the advantage of
+not depending on the normal distribution, but this test is not as robust
+as the linear regression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor.test}\NormalTok{(PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{irradianceWater, PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{depth, }
+         \DataTypeTok{method =} \StringTok{"spearman"}\NormalTok{, }\DataTypeTok{exact =} \OtherTok{FALSE}\NormalTok{) }\CommentTok{# here is how you do it. method}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Spearman's rank correlation rho
+## 
+## data:  PeterPaul.chem.nutrients$irradianceWater and PeterPaul.chem.nutrients$depth
+## S = 1.1474e+12, p-value < 2.2e-16
+## alternative hypothesis: true rho is not equal to 0
+## sample estimates:
+##        rho 
+## -0.8674103
+\end{verbatim}
+
+\subsubsection{Multiple Regression}\label{multiple-regression}
+
+It is possible, and often useful, to consider multiple continuous
+explanatory variables at a time in a linear regression. For example,
+total phosphorus concentration could be dependent on depth and dissolved
+oxygen concentration:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TPregression <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, tp_ug }\OperatorTok{~}\StringTok{ }\NormalTok{depth }\OperatorTok{+}\StringTok{ }\NormalTok{dissolvedOxygen)}
+\KeywordTok{summary}\NormalTok{(TPregression) }\CommentTok{#TP = 6 (0ox and 0 depth, not real) +1.5(depth) + 0.94(DO) + error}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = tp_ug ~ depth + dissolvedOxygen, data = PeterPaul.chem.nutrients)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.004  -6.889  -3.108   3.480  50.377 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)       6.0031     1.7302   3.470 0.000557 ***
+## depth             1.5041     0.2580   5.829 8.90e-09 ***
+## dissolvedOxygen   0.9386     0.1824   5.147 3.53e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 11.85 on 633 degrees of freedom
+##   (14812 observations deleted due to missingness)
+## Multiple R-squared:  0.08214,    Adjusted R-squared:  0.07924 
+## F-statistic: 28.33 on 2 and 633 DF,  p-value: 1.652e-12
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#low pvalues (significan results) but explaining low variance of the data }
+
+\NormalTok{TPplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }
+                 \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ dissolvedOxygen, }\DataTypeTok{y =}\NormalTok{ tp_ug, }\DataTypeTok{color =}\NormalTok{ depth)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{20}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(TPplot) }\CommentTok{#showing us that our linear model is not a good predictor}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 14812 rows containing missing values (geom_point).
+\end{verbatim}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-7-1.pdf}
+\#\#\# Correlation Plots We can also make exploratory plots of several
+continuous data points to determine possible relationships, as well as
+covariance among explanatory variables.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#install.packages("corrplot")}
+\KeywordTok{library}\NormalTok{(corrplot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## corrplot 0.84 loaded
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PeterPaulnutrients <-}\StringTok{ }
+\StringTok{  }\NormalTok{PeterPaul.chem.nutrients }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(tn_ug}\OperatorTok{:}\NormalTok{po4) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{na.omit}\NormalTok{() }\CommentTok{# with NAs you dont get correlations}
+\NormalTok{PeterPaulCorr <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(PeterPaulnutrients)}
+\KeywordTok{corrplot}\NormalTok{(PeterPaulCorr, }\DataTypeTok{method =} \StringTok{"ellipse"}\NormalTok{) }\CommentTok{# without ellipse it gives you circles}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{corrplot.mixed}\NormalTok{(PeterPaulCorr, }\DataTypeTok{upper =} \StringTok{"ellipse"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-8-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# why not to use too many variables. you will find meaning less correlations. think about your questions. Overparametrization of your model. Runing out of degrees of freedom.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{AIC to select variables}\label{aic-to-select-variables}
+
+However, it is possible to over-parameterize a linear model. Adding
+additional explanatory variables takes away degrees of freedom, and if
+explanatory variables co-vary the interpretation can become overly
+complicated. Remember, an ideal statistical model balances simplicity
+and explanatory power! To help with this tradeoff, we can use the
+\textbf{Akaike's Information Criterion (AIC)} to compute a stepwise
+regression that either adds explanatory variables from the bottom up or
+removes explanatory variables from a full set of suggested options. The
+smaller the AIC value, the better. There is a BIC also. Mostly the same.
+no strong argument for either.
+
+Let's say we want to know which explanatory variables will allow us to
+best predict total phosphorus concentrations. Potential explanatory
+variables from the dataset could include depth, dissolved oxygen,
+temperature, PAR, total N concentration, and phosphate concentration.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PeterPaul.naomit <-}\StringTok{ }\KeywordTok{na.omit}\NormalTok{(PeterPaul.chem.nutrients) }\CommentTok{#here we lose a lot of points}
+\NormalTok{TPAIC <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.naomit, tp_ug }\OperatorTok{~}\StringTok{ }\NormalTok{depth }\OperatorTok{+}\StringTok{ }\NormalTok{dissolvedOxygen }\OperatorTok{+}\StringTok{ }
+\StringTok{              }\NormalTok{temperature_C }\OperatorTok{+}\StringTok{ }\NormalTok{tn_ug }\OperatorTok{+}\StringTok{ }\NormalTok{po4)}
+\KeywordTok{step}\NormalTok{(TPAIC) }\CommentTok{# the lower AIC value the better}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Start:  AIC=884.92
+## tp_ug ~ depth + dissolvedOxygen + temperature_C + tn_ug + po4
+## 
+##                   Df Sum of Sq     RSS     AIC
+## - dissolvedOxygen  1       1.8  8921.6  882.96
+## - po4              1      24.9  8944.6  883.59
+## - depth            1      48.7  8968.5  884.23
+## <none>                          8919.8  884.92
+## - temperature_C    1     783.3  9703.1  903.29
+## - tn_ug            1    9501.2 18421.0 1058.42
+## 
+## Step:  AIC=882.96
+## tp_ug ~ depth + temperature_C + tn_ug + po4
+## 
+##                 Df Sum of Sq     RSS     AIC
+## - po4            1      25.5  8947.1  881.65
+## - depth          1      54.2  8975.8  882.43
+## <none>                        8921.6  882.96
+## - temperature_C  1     943.1  9864.7  905.28
+## - tn_ug          1    9975.2 18896.8 1062.59
+## 
+## Step:  AIC=881.65
+## tp_ug ~ depth + temperature_C + tn_ug
+## 
+##                 Df Sum of Sq     RSS     AIC
+## - depth          1      52.3  8999.3  881.06
+## <none>                        8947.1  881.65
+## - temperature_C  1     921.1  9868.2  903.37
+## - tn_ug          1   10251.2 19198.3 1064.42
+## 
+## Step:  AIC=881.06
+## tp_ug ~ temperature_C + tn_ug
+## 
+##                 Df Sum of Sq     RSS     AIC
+## <none>                        8999.3  881.06
+## - temperature_C  1    1117.5 10116.8  907.39
+## - tn_ug          1   10334.2 19333.6 1064.12
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = tp_ug ~ temperature_C + tn_ug, data = PeterPaul.naomit)
+## 
+## Coefficients:
+##   (Intercept)  temperature_C          tn_ug  
+##      10.06877       -0.46883        0.02794
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TPmodel <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.naomit, tp_ug }\OperatorTok{~}\StringTok{ }\NormalTok{temperature_C }\OperatorTok{+}\StringTok{ }\NormalTok{tn_ug) }\CommentTok{# you run the best fit model on its own.}
+\KeywordTok{summary}\NormalTok{(TPmodel) }\CommentTok{#54% of the variance. better!}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = tp_ug ~ temperature_C + tn_ug, data = PeterPaul.naomit)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -12.462  -3.942  -0.252   3.074  33.220 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   10.068766   1.744314   5.772 2.42e-08 ***
+## temperature_C -0.468831   0.086061  -5.448 1.27e-07 ***
+## tn_ug          0.027938   0.001686  16.567  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.136 on 239 degrees of freedom
+## Multiple R-squared:  0.5418, Adjusted R-squared:  0.538 
+## F-statistic: 141.3 on 2 and 239 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\subsection{ANCOVA \#adds multiple levels of alphas (categorical
+variables)}\label{ancova-adds-multiple-levels-of-alphas-categorical-variables}
+
+Analysis of Covariance consists of a prediction of a continuous response
+variable by both continuous and categorical explanatory variables. We
+set this up in R with the \texttt{lm} function, just like prior
+applications in this lesson.
+
+Let's say we wanted to predict total nitrogen concentrations by depth
+and by lake, similarly to what we did with a two-way ANOVA for depth ID
+and lake.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# main effects}
+\NormalTok{TNancova.main <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, tn_ug }\OperatorTok{~}\StringTok{ }\NormalTok{lakename }\OperatorTok{+}\StringTok{ }\NormalTok{depth)}
+\KeywordTok{summary}\NormalTok{(TNancova.main) }\CommentTok{#TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7depth(not significant). very little variance.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = tn_ug ~ lakename + depth, data = PeterPaul.chem.nutrients)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -356.62 -120.28  -32.08   71.53 1564.56 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)         353.085     16.005  22.061  < 2e-16 ***
+## lakenamePeter Lake  135.361     20.326   6.659 8.52e-11 ***
+## depth                -9.716      6.347  -1.531    0.127    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 209.6 on 425 degrees of freedom
+##   (15020 observations deleted due to missingness)
+## Multiple R-squared:  0.09734,    Adjusted R-squared:  0.09309 
+## F-statistic: 22.91 on 2 and 425 DF,  p-value: 3.541e-10
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# interaction effects}
+\NormalTok{TNancova.interaction <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, tn_ug }\OperatorTok{~}\StringTok{ }\NormalTok{lakename }\OperatorTok{*}\StringTok{ }\NormalTok{depth)}
+\KeywordTok{summary}\NormalTok{(TNancova.interaction) }\CommentTok{# TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = tn_ug ~ lakename * depth, data = PeterPaul.chem.nutrients)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -377.65 -108.22  -27.51   69.89 1552.95 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                324.53      17.48  18.566  < 2e-16 ***
+## lakenamePeter Lake         184.95      23.94   7.726 8.09e-14 ***
+## depth                       19.87      10.02   1.982 0.048073 *  
+## lakenamePeter Lake:depth   -48.42      12.82  -3.777 0.000182 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 206.4 on 424 degrees of freedom
+##   (15020 observations deleted due to missingness)
+## Multiple R-squared:  0.1267, Adjusted R-squared:  0.1205 
+## F-statistic: 20.51 on 3 and 424 DF,  p-value: 1.994e-12
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TNplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ tn_ug, }\DataTypeTok{color =}\NormalTok{ lakename)) }\OperatorTok{+}\StringTok{ }\CommentTok{#color in aes two lines + }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(TNplot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 15020 rows containing non-finite values (stat_smooth).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 15020 rows containing missing values (geom_point).
+\end{verbatim}
+
+\includegraphics{12_GLMs_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Make the graph attractive}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

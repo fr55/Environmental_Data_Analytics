@@ -117,7 +117,7 @@ irradiancebydepth2 <-
     geom_point(alpha = 0.2) +
     scale_y_log10() +
     geom_smooth(method = 'lm', se = FALSE, color = "black") + #remove the variance from the line
-    scale_x_continuous(breaks = c(0,2,4,6,8,10,12)) + # number in x axis
+    scale_x_continuous(breaks = c(0,2,4,6,8,10,12))  # number in x axis
   print(irradiancebydepth2)
 
 # Make the graph attractive
@@ -191,7 +191,7 @@ summary(TNancova.main) #TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7de
 TNancova.interaction <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename * depth)
 summary(TNancova.interaction) # TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.
 
-TNplot <- ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = tn_ug, color = lakename)) #color in aes two lines + 
+TNplot <- ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = tn_ug, color = lakename)) + #color in aes two lines + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE) +
   xlim(0, 10)

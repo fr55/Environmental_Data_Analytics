@@ -1,0 +1,749 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={6: Data Exploration},
+            pdfauthor={Environmental Data Analytics \textbar{} Kateri Salk},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{6: Data Exploration}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Environmental Data Analytics \textbar{} Kateri Salk}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Spring 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{LESSON OBJECTIVES}\label{lesson-objectives}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Set up a data analysis session in RStudio
+\item
+  Import and explore datasets in R
+\item
+  Apply data exploration skills to a real-world example dataset
+\end{enumerate}
+
+\subsection{OPENING DISCUSSION: WHY DO WE EXPLORE OUR
+DATA?}\label{opening-discussion-why-do-we-explore-our-data}
+
+Why is data exploration our first step in analyzing a dataset? What
+information do we gain? How does data exploration aid in our
+decision-making for data analysis steps further down the pipeline?
+
+\subsection{IMPORT DATA AND VIEW
+SUMMARIES}\label{import-data-and-view-summaries}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 1. Set up your working directory}
+\KeywordTok{getwd}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "C:/Users/Felipe/OneDrive - Duke University/1. DUKE/1. Ramos 2 Semestre/EOS-872 Env. Data Analytics/Environmental_Data_Analytics"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 2. Load packges}
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages ---------------------------------------------------- tidyverse 1.2.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.0.0     v purrr   0.2.5
+## v tibble  1.4.2     v dplyr   0.7.6
+## v tidyr   0.8.1     v stringr 1.3.1
+## v readr   1.1.1     v forcats 0.3.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 3. Import datasets}
+\NormalTok{USGS.flow.data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./Data/Raw/USGS_Site02085000_Flow_Raw.csv"}\NormalTok{)}
+
+\KeywordTok{View}\NormalTok{(USGS.flow.data)}
+\CommentTok{# Alternate option: click on data frame in Environment tab}
+
+\KeywordTok{class}\NormalTok{(USGS.flow.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "data.frame"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{colnames}\NormalTok{(USGS.flow.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "agency_cd"              "site_no"               
+##  [3] "datetime"               "X165986_00060_00001"   
+##  [5] "X165986_00060_00001_cd" "X165987_00060_00002"   
+##  [7] "X165987_00060_00002_cd" "X84936_00060_00003"    
+##  [9] "X84936_00060_00003_cd"  "X84937_00065_00001"    
+## [11] "X84937_00065_00001_cd"  "X84938_00065_00002"    
+## [13] "X84938_00065_00002_cd"  "X84939_00065_00003"    
+## [15] "X84939_00065_00003_cd"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Rename columns}
+\KeywordTok{colnames}\NormalTok{(USGS.flow.data) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"agency_cd"}\NormalTok{, }\StringTok{"site_no"}\NormalTok{, }\StringTok{"datetime"}\NormalTok{, }
+                              \StringTok{"discharge.max"}\NormalTok{, }\StringTok{"discharge.max.approval"}\NormalTok{, }
+                              \StringTok{"discharge.min"}\NormalTok{, }\StringTok{"discharge.min.approval"}\NormalTok{, }
+                              \StringTok{"discharge.mean"}\NormalTok{, }\StringTok{"discharge.mean.approval"}\NormalTok{, }
+                              \StringTok{"gage.height.max"}\NormalTok{, }\StringTok{"gage.height.max.approval"}\NormalTok{, }
+                              \StringTok{"gage.height.min"}\NormalTok{, }\StringTok{"gage.height.min.approval"}\NormalTok{, }
+                              \StringTok{"gage.height.mean"}\NormalTok{, }\StringTok{"gage.height.mean.approval"}\NormalTok{)}
+\KeywordTok{str}\NormalTok{(USGS.flow.data) }\CommentTok{#structure}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    33216 obs. of  15 variables:
+##  $ agency_cd                : Factor w/ 1 level "USGS": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ site_no                  : int  2085000 2085000 2085000 2085000 2085000 2085000 2085000 2085000 2085000 2085000 ...
+##  $ datetime                 : Factor w/ 33216 levels "1/1/00","1/1/01",..: 20 1021 2022 2295 2386 2477 2568 2659 2750 111 ...
+##  $ discharge.max            : num  74 61 56 54 48 47 44 41 44 57 ...
+##  $ discharge.max.approval   : Factor w/ 4 levels "","A","A:e","P": 2 2 2 2 2 2 2 2 2 2 ...
+##  $ discharge.min            : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ discharge.min.approval   : Factor w/ 3 levels "","A","P": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ discharge.mean           : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ discharge.mean.approval  : Factor w/ 3 levels "","A","P": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ gage.height.max          : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ gage.height.max.approval : Factor w/ 3 levels "","A","P": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ gage.height.min          : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ gage.height.min.approval : Factor w/ 3 levels "","A","P": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ gage.height.mean         : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ gage.height.mean.approval: Factor w/ 3 levels "","A","P": 1 1 1 1 1 1 1 1 1 1 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(USGS.flow.data) }\CommentTok{#dimension}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 33216    15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#head(USGS.flow.data) # not useful for kniting it (looks at six rows)}
+\KeywordTok{class}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{datetime) }\CommentTok{# it is a factor. Problem. Formating dates}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "factor"
+\end{verbatim}
+
+\subsection{ADJUSTING DATASETS}\label{adjusting-datasets}
+
+\subsubsection{Formatting dates}\label{formatting-dates}
+
+R will often import dates as factors or characters rather than dates. To
+fix, this we need to tell R that it is looking at dates. We also need to
+specify the format the dates are in. By default, if you don't provide a
+format, R will attempt to use \%Y-\%m-\%d or \%Y/\%m/\%d as a default.
+Note: if you are working collaboratively in an international setting,
+using a year-month-day format in spreadsheets is the least ambiguous of
+date formats. Make sure to check whether month-day-year or
+day-month-year is used in an ambiguously formatted spreadsheet.
+
+Formatting of dates in R:
+
+\%d day as number (0-31) \%m month (00-12, can be e.g., 01 or 1) \%y
+2-digit year \%Y 4-digit year \%a abbreviated weekday \%A unabbreviated
+weekday \%b abbreviated month \%B unabbreviated month
+
+In some cases when dates are provided as integers, you may need to
+provide an origin for your dates. Beware: the ``origin'' date for Excel
+(Windows), Excel (Mac), R, and MATLAB all have different origin dates.
+Google this if it comes up.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{help}\NormalTok{(as.Date)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## starting httpd help server ... done
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Adjust date formatting for today}
+\CommentTok{# Write code for three different date formats. }
+\CommentTok{# An example is provided to get you started.}
+\CommentTok{# (code must be uncommented)}
+\NormalTok{today <-}\StringTok{ }\KeywordTok{Sys.Date}\NormalTok{()}
+\KeywordTok{format}\NormalTok{(today, }\DataTypeTok{format =} \StringTok{"%B"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "febrero"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{format}\NormalTok{(today, }\DataTypeTok{format =} \StringTok{"%d-%m-%Y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "22-02-2019"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{format}\NormalTok{(today, }\DataTypeTok{format =} \StringTok{"%a"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "vi."
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{format}\NormalTok{(today}\OperatorTok{-}\DecValTok{1}\NormalTok{, }\DataTypeTok{format =} \StringTok{"%A %d de %B de %Y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "jueves 21 de febrero de 2019"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{USGS.flow.data}\OperatorTok{$}\NormalTok{datetime <-}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{datetime, }\DataTypeTok{format =} \StringTok{"%m/%d/%y"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+Note that for every date prior to 1969, R has assigned the date in the
+2000s rather than the 1900s. This can be fixed with an \texttt{ifelse}
+statement inside a function. Run through the code below and write what
+is happening in the comment above each line.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# changes the format to remove 19 and 20}
+\NormalTok{USGS.flow.data}\OperatorTok{$}\NormalTok{datetime <-}\StringTok{ }\KeywordTok{format}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{datetime, }\StringTok{"%y%m%d"}\NormalTok{)}
+
+\CommentTok{# Changes 20 with 19}
+\NormalTok{create.early.dates <-}\StringTok{ }\NormalTok{(}\ControlFlowTok{function}\NormalTok{(d) \{}
+       \KeywordTok{paste0}\NormalTok{(}\KeywordTok{ifelse}\NormalTok{(d }\OperatorTok{>}\StringTok{ }\DecValTok{181231}\NormalTok{,}\StringTok{"19"}\NormalTok{,}\StringTok{"20"}\NormalTok{),d)}
+\NormalTok{       \})}
+\CommentTok{# use the function}
+\NormalTok{USGS.flow.data}\OperatorTok{$}\NormalTok{datetime <-}\StringTok{ }\KeywordTok{create.early.dates}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{datetime)}
+
+\CommentTok{# fix the format}
+\NormalTok{USGS.flow.data}\OperatorTok{$}\NormalTok{datetime <-}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{datetime, }\DataTypeTok{format =} \StringTok{"%Y%m%d"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Removing NAs}\label{removing-nas}
+
+Notice in our dataset that our discharge and gage height observations
+have many NAs, meaning no measurement was recorded for a specific day.
+In some cases, it might be in our best interest to remove NAs from a
+dataset. Removing NAs or not will depend on your research question.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{discharge.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's 
+##    0.220    5.005   15.200   44.598   40.600 3270.000    28049
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(USGS.flow.data}\OperatorTok{$}\NormalTok{gage.height.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##   0.870   1.430   1.720   1.856   2.120  14.470   28171
+\end{verbatim}
+
+Question: What types of research questions might make it favorable to
+remove NAs from a dataset, and what types of research questions might
+make it favorable to retain NAs in the dataset?
+
+\begin{quote}
+Answer: NA can mean something (survey, valid response). In other cases
+(quant) . careful with blank spaces. Important to explain in readme file
+what NA is. Is the next given there where years with no data we
+eliminate them.
+\end{quote}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{USGS.flow.data.complete <-}\StringTok{ }\KeywordTok{na.omit}\NormalTok{(USGS.flow.data) }\CommentTok{#remove the entire row  (look for how to removes NAs from a column)}
+\KeywordTok{dim}\NormalTok{(USGS.flow.data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 33216    15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(USGS.flow.data.complete)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5045   15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#complete.cases. tells you what rows (or column) is complete.}
+
+\KeywordTok{mean}\NormalTok{(USGS.flow.data.complete}\OperatorTok{$}\NormalTok{discharge.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 45.63464
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sd}\NormalTok{(USGS.flow.data.complete}\OperatorTok{$}\NormalTok{discharge.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 124.4523
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(USGS.flow.data.complete}\OperatorTok{$}\NormalTok{discharge.mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.22    5.43   15.90   45.63   41.80 3270.00
+\end{verbatim}
+
+\subsection{VISUALIZATION FOR DATA
+EXPLORATION}\label{visualization-for-data-exploration}
+
+Although the \texttt{summary()} function is helpful in getting an idea
+of the spread of values in a numeric dataset, it can be useful to create
+visual representations of the data to help form hypotheses and direct
+downstream data analysis. Below is a summary of the useful types of
+graphs that can be
+
+Note: each of these approaches utilize the package ``ggplot2''. We will
+be covering the syntax of ggplot in a later lesson, but for now you
+should familiarize yourself with the functionality of what each command
+is doing.
+
+\subsubsection{Bar Chart (function:
+geom\_bar)}\label{bar-chart-function-geom_bar}
+
+Visualize count data for categorical variables.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean.approval)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{() }\CommentTok{#works great for categorical. also for quan but you can use histogram.}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\subsubsection{Histogram (function:
+geom\_histogram)}\label{histogram-function-geom_histogram}
+
+Visualize distributions of values for continuous numerical variables.
+What is happening in each line of code? Insert a comment above each
+line.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# better to use the aes there. Is more specific for bigger plots.}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# narrower the bins (units of the variable)}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean), }\DataTypeTok{binwidth =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-7-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# or the number of bins}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean), }\DataTypeTok{bins =} \DecValTok{20}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-7-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# we remove some data from the graph. is like doing a some. explain that you are doing that and why.}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{binwidth =} \DecValTok{10}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{limits =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{500}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 53 rows containing non-finite values (stat_bin).
+\end{verbatim}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-7-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# another variable}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-7-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# you can name your graph to call it later}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Frequency line graph (function:
+geom\_freqpoly)}\label{frequency-line-graph-function-geom_freqpoly}
+
+An alternate to a histogram is a frequency polygon graph (distributions
+of values for continuous numerical variables). Instead of displaying
+bars, counts of continuous variables are displayed as lines. This is
+advantageous if you want to display multiple variables or categories of
+variables at once.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#three frecuency poligons for diff data. we dont want to mix variables with diff units.}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_freqpoly}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean), }\DataTypeTok{bins =} \DecValTok{50}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_freqpoly}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.min), }\DataTypeTok{bins =} \DecValTok{50}\NormalTok{, }\DataTypeTok{color =} \StringTok{"blue"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_freqpoly}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.max), }\DataTypeTok{bins =} \DecValTok{50}\NormalTok{, }\DataTypeTok{color =} \StringTok{"red"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{limits =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 4 rows containing non-finite values (stat_bin).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 28 rows containing non-finite values (stat_bin).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 2 rows containing missing values (geom_path).
+
+## Warning: Removed 2 rows containing missing values (geom_path).
+
+## Warning: Removed 2 rows containing missing values (geom_path).
+\end{verbatim}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# color it depending of the status of aproval}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_freqpoly}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean, }\DataTypeTok{color =}\NormalTok{ gage.height.mean.approval), }\DataTypeTok{bins =} \DecValTok{50}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{limits =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"top"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 4 rows containing non-finite values (stat_bin).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 4 rows containing missing values (geom_path).
+\end{verbatim}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-8-2.pdf}
+\#\#\# Box-and-whisker plots (function: geom\_boxplot)
+
+A box-and-whisker plot is yet another alternative to histograms
+(distributions of values for continuous numerical variables). These
+plots consist of:
+
+\begin{itemize}
+\item
+  A box from the 25th to the 75th percentile of the data, called the
+  interquartile range (IQR).
+\item
+  A bold line inside the box representing the median value of the data.
+  Whether the median is in the center or off to one side of the IQR will
+  give you an idea about the skewness of your data.
+\item
+  A line outside of the box representing values falling within 1.5 times
+  the IQR.
+\item
+  Points representing outliers, values that fall outside 1.5 times the
+  IQR.
+\end{itemize}
+
+An alternate option is a violin plot, which displays density
+distributions, somewhat like a hybrid of the box-and-whiskers and the
+frequency polygon plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean.approval, }\DataTypeTok{y =}\NormalTok{ gage.height.mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# we divided the data in groups (of 1?)}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_boxplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean, }\DataTypeTok{y =}\NormalTok{ discharge.mean, }\DataTypeTok{group =} \KeywordTok{cut_width}\NormalTok{(gage.height.mean, }\DecValTok{1}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-9-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# another type of boxplot.You have to specify the quantiles}
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_violin}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ gage.height.mean.approval, }\DataTypeTok{y =}\NormalTok{ gage.height.mean), }\DataTypeTok{draw_quantiles =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.25}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-9-3.pdf}
+
+Question: what are the pros and cons of each type of frequency graph
+(histogram, frequency polygon, box-and whisker, violin)?
+
+\begin{quote}
+Answer:
+\end{quote}
+
+\subsubsection{Scatterplot (function:
+geom\_point)}\label{scatterplot-function-geom_point}
+
+Visualize relationships between continuous numerical variables.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(USGS.flow.data.complete) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ discharge.mean, }\DataTypeTok{y =}\NormalTok{ gage.height.mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06_DataExploration_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\subsection{ENDING DISCUSSION}\label{ending-discussion}
+
+How can multiple options for data exploration inform our understanding
+of our data? What did you learn about the USGS discharge dataset today?
+
+\begin{quote}
+ANSWER:
+\end{quote}
+
+This passage from R for Data Science sums up some of the questions we
+should ask ourselves when initially exploring a dataset. ``Patterns in
+your data provide clues about relationships. If a systematic
+relationship exists between two variables it will appear as a pattern in
+the data. If you spot a pattern, ask yourself:
+
+``Could this pattern be due to coincidence (i.e.~random chance)?
+
+``How can you describe the relationship implied by the pattern?
+
+``How strong is the relationship implied by the pattern?
+
+``What other variables might affect the relationship?
+
+``Does the relationship change if you look at individual subgroups of
+the data?''
+
+Do you see any patterns in the USGS data for the Eno River? What might
+be responsible for those patterns and/or relationships?
+
+\begin{quote}
+ANSWER:
+\end{quote}
+
+
+\end{document}
