@@ -14,6 +14,8 @@ editor_options:
 2. Choose and justify appropriate statistical models when time is an explanatory variable
 3. Apply Mann-Kendall and Seasonal Mann-Kendall to datasets with temporal components
 
+FRA: Random effect. we are not interested in the direct effect but we want to take account the variance. We can compare AIC values between the fix and random. Also if you dont see big diff between the coeff. or its impact in the predictions over time.
+
 ## SET UP YOUR DATA ANALYSIS SESSION
 
 ```{r, message = FALSE, warning = FALSE}
@@ -76,8 +78,22 @@ ggplot(PeterPaul.nutrients.surface, aes(x = sampledate, y = tp_ug, color = laken
 Peter.nutrients.surface <- filter(PeterPaul.nutrients.surface, lakename == "Peter Lake")
 Paul.nutrients.surface <- filter(PeterPaul.nutrients.surface, lakename == "Paul Lake")
 
+# Paul lake is control. We want to see if they have diff trends.
+
 # Run a Mann-Kendall test
 mk.test(Peter.nutrients.surface$tp_ug)
+
+#Mann-Kendall trend test
+
+#data:  Peter.nutrients.surface$tp_ug                   
+#z = 4.3966, n = 132, p-value = 1.099e-05              Low pvalue. there is a trend over time. z positive. positive trend over time.
+#alternative hypothesis: true S is not equal to 0      No trend over time
+#sample estimates:
+#           S         varS          tau   
+#2.236000e+03 2.584133e+05 2.587065e-01 
+
+#Is there a change point of the trend?
+
 
 ```
 
@@ -89,25 +105,40 @@ Pettitt's test is also included in the `trend` package. This nonparametric test 
 # Test for change point
 pettitt.test(Peter.nutrients.surface$tp_ug)
 
-# Run separate Mann-Kendall for each change point
-mk.test(Peter.nutrients.surface$tp_ug[1:34])
-mk.test(Peter.nutrients.surface$tp_ug[35:132])
+#	Pettitt's test for single change-point detection
+
+#data:  Peter.nutrients.surface$tp_ug 
+#U* = 2767, p-value = 4.92e-09
+#alternative hypothesis: two.sided
+#sample estimates:
+#probable change point at time K        # where is the change located. 1993. when the experimet started.
+#                             35 
+
+
+
+# Run separate Mann-Kendall for each change point  # to see if there is another change.
+mk.test(Peter.nutrients.surface$tp_ug[1:34]) # no significant trend (becaue the change is balancing it)
+mk.test(Peter.nutrients.surface$tp_ug[35:132]) # no significant trend 
 
 # Is there a second change point?
-pettitt.test(Peter.nutrients.surface$tp_ug[35:132])
+pettitt.test(Peter.nutrients.surface$tp_ug[35:132]) # there is a trend change.
 
 # Run another Mann-Kendall for the second change point
-mk.test(Peter.nutrients.surface$tp_ug[35:113])
-mk.test(Peter.nutrients.surface$tp_ug[114:132])
+mk.test(Peter.nutrients.surface$tp_ug[35:113]) #here we detect the trend
+mk.test(Peter.nutrients.surface$tp_ug[114:132]) #here no trend.
 
 # Run the same test for Paul Lake. 
-mk.test(Paul.nutrients.surface$tp_ug)
-pettitt.test(Paul.nutrients.surface$tp_ug)
+mk.test(Paul.nutrients.surface$tp_ug) #non significant
+pettitt.test(Paul.nutrients.surface$tp_ug) #non significant
 
 # Add vertical lines to the original graph to represent change points
 ggplot(PeterPaul.nutrients.surface, aes(x = sampledate, y = tp_ug, color = lakename)) + 
   geom_point() +
-  scale_color_manual(values = c("#7fcdbb", "#253494"))
+  scale_color_manual(values = c("#7fcdbb", "#253494")) +
+  geom_vline(xintercept=as.Date("1993/05/20"), color= "#253494", lty=2) +
+   geom_vline(xintercept=as.Date("1998/01/01"), color= "#253494", lty=2)
+  #+ scale_y_log10() use when you have realy low and high values.
+#you can do sense slope to quantify the slope
 
 ```
 ### Seasonal Mann-Kendall
@@ -139,7 +170,7 @@ Some situations may require us to predict values for data points that fall withi
 
 Question: Under what circumstances would you consider each of these options for interpolation? 
 
-> ANSWER: 
+> ANSWER: Linear. because continues data.
 
 Tip: Check your dataset to see if there is an NA value in the first row. You may need to add a value for that first row or trim the dataset so that the new first row corresponds to the first measurement.
 
@@ -147,7 +178,7 @@ Tip: Check your dataset to see if there is an NA value in the first row. You may
 # Run a linear interpolation of the dataset to fill in gaps
 USGS.flow.data.interpolated <- approx(USGS.flow.data.trimmed$datetime,
                                       USGS.flow.data.trimmed$discharge.mean, 
-                                      method = "linear", n = 3630)
+                                      method = "linear", n = 3630) # so you dont generate new points. I think this was to fill rows with NAs. It give us a list.
 
 # Turn the interpolated dataset into a proper dataframe
 USGS.flow.data.interpolated <- do.call(cbind.data.frame, USGS.flow.data.interpolated)
@@ -155,14 +186,14 @@ names(USGS.flow.data.interpolated) <- c("Date", "Discharge")
 USGS.flow.data.interpolated$Date <- as.Date(USGS.flow.data.interpolated$Date, 
                                             origin = "1970/01/01")
 
-# Create a time series object
+# Create a time series object FRA: we need this for the seasonal test.
 USGS.flow.data.timeseries <- ts(USGS.flow.data.interpolated$Discharge, 
-                                start = c(2009, 1) ,frequency = 12)
+                                start = c(2009, 1) ,frequency = 12) #12 beacuse is monthly. you can out 365.
 
 # Run a Seasonal Mann-Kendall test
 USGS.smktest <- smk.test(USGS.flow.data.timeseries)
-USGS.smktest
-summary(USGS.smktest)
+USGS.smktest # overall trend. similar to the first test that we did. pvalue low, there is a trend.
+summary(USGS.smktest) #gives as each month. the trends each season. Season 11 biggest trend. No trend in season 5 for example
 ```
 
 Interpreting results of the Seasonal Mann-Kendall Test: 
