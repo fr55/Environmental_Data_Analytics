@@ -92,7 +92,7 @@ TempTest.auto <- lme(data = PeterPaul.summertemp,
 TempTest.auto
 # what the variability is among the weeks. That is why it gives a StdDev. (the random effect). Fixed effects gives coef.
 
-#summary(TempTest.auto) # esto lo puse yo
+summary(TempTest.auto) # esto lo puse yo
 
 # 
 ACF(TempTest.auto)
