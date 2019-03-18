@@ -1,6 +1,6 @@
 ---
 title: "Assignment 8: Time Series Analysis"
-author: "Student Name"
+author: "Felipe Raby Amadori"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -32,12 +32,41 @@ The completed exercise is due on Tuesday, 19 March, 2019 before class begins.
 
 Question: Did you do this?
 
-> ANSWER: 
+> ANSWER: Yes
 
 ## Set up your session 
 2. Set up your session. Upload the EPA air quality raw dataset for PM2.5 in 2018, and the processed NTL-LTER dataset for nutrients in Peter and Paul lakes. Build a ggplot theme and set it as your default theme. Make sure date variables are set to a date format.
 
 ```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, eval=TRUE)
+getwd()
+library(FSA)
+library(tidyverse)
+library(RColorBrewer)
+library(ggpubr)
+library(viridis)
+library(colormap)
+library(lubridate)
+library(nlme)
+library(lsmeans)
+library(multcompView)
+library(trend)
+
+felipe_theme <- theme_light(base_size = 12) +
+  theme(axis.text = element_text(color = "grey8"), 
+        legend.position = "right", plot.title = element_text(hjust = 0.5)) 
+theme_set(felipe_theme)
+
+EPA_raw_AQ_PM25_2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv")
+NTL_TER_raw_ChemistryNutr_PeterPaul <- 
+  read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+
+class(EPA_raw_AQ_PM25_2018$Date)
+class(NTL_TER_raw_ChemistryNutr_PeterPaul$sampledate)
+
+EPA_raw_AQ_PM25_2018$Date <- as.Date(EPA_raw_AQ_PM25_2018$Date, format = "%m/%d/%y")
+NTL_TER_raw_ChemistryNutr_PeterPaul$sampledate <- 
+  as.Date(NTL_TER_raw_ChemistryNutr_PeterPaul$sampledate, format = "%Y-%m-%d")
 
 ```
 
@@ -52,6 +81,18 @@ Research question: Do PM2.5 concentrations have a significant trend in 2018?
 
 ```{r}
 
+#3a.
+
+ggplot(EPA_raw_AQ_PM25_2018, 
+       aes(x = Date, y = Daily.Mean.PM2.5.Concentration, color = Daily.Mean.PM2.5.Concentration)) +
+  geom_point(alpha = 0.5) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_color_distiller(palette = "Set1") +
+  xlab(expression("Date")) +
+  ylab(expression(paste("PM 2.5 Concentration (\U003BCg/lt LC)"))) +
+  theme(legend.position = "none") +
+  ggtitle("2018 Daily PM2.5 concentration")
+
 ```
 
 3b. Insert the following line of code into your R chunk. This will eliminate duplicate measurements on single dates for each site.
@@ -63,24 +104,43 @@ PM2.5 = PM2.5[!duplicated(PM2.5$Date),]
 3d. Run a mixed effects model. 
 
 ```{r}
+#3b.
+PM2.5 = EPA_raw_AQ_PM25_2018[order(EPA_raw_AQ_PM25_2018[,'Date'],-EPA_raw_AQ_PM25_2018[,'Site.ID']),]
+PM2.5 = PM2.5[!duplicated(PM2.5$Date),]
+
+#3c.
+PM252018.auto <- lme(data = EPA_raw_AQ_PM25_2018, Daily.Mean.PM2.5.Concentration ~ Date, 
+                     random = ~1|Site.Name)
+PM252018.auto
+
+ACF(PM252018.auto)
+
+#3d.
+PM252018.mixed <- lme(data = PM2.5, Daily.Mean.PM2.5.Concentration ~ Date, 
+                     random = ~1|Site.Name,
+                     correlation = corAR1(form = ~ Date|Site.Name, value = 0.473017989),
+                     method = "REML")
+summary(PM252018.mixed)
 
 ```
 
 Is there a significant increasing or decreasing trend in PM2.5 concentrations in 2018? 
 
-> ANSWER: 
+> ANSWER: There is not a significant decrease trend in PM2.5 concentrations in 2018 (Linear mixed-effects model, p-value = 0.2143 > 0.05).
 
 3e. Run a fixed effects model with Date as the only explanatory variable. Then test whether the mixed effects model is a better fit than the fixed effect model. 
 
 ```{r}
+PM252018.fixed <- gls(data = PM2.5, Daily.Mean.PM2.5.Concentration ~ Date, method = "REML")
+summary(PM252018.fixed)
+anova(PM252018.mixed, PM252018.fixed)
 
 ```
 
 
 Which model is better?
 
-> ANSWER: 
-
+> ANSWER: The mixed effects model has a lower AIC value (1756.62 vs 1865.2); hence, it is a better fit than the fixed effect model.
 
 ## Run a Mann-Kendall test
 
@@ -90,16 +150,146 @@ Research question: Is there a trend in total N surface concentrations in Peter a
 
 ```{r}
 
-```
+# Wrangle our dataset
+PeterPaul.tN.surface <- 
+  NTL_TER_raw_ChemistryNutr_PeterPaul %>%
+  select(lakename, sampledate, depth, tn_ug) %>%
+  filter(depth == 0) %>%
+  filter(!is.na(tn_ug))
 
+ggplot(PeterPaul.tN.surface, aes(x = sampledate, y = tn_ug, color = lakename)) + 
+  geom_point() +
+  xlab(expression("Date")) +
+  ylab(expression(paste("Total Nitrogen Concentration (\U003BCg/lt)"))) +
+  ggtitle("Peter Paul Lakes Total Nitrogen Concentration") +
+  scale_color_manual(values = c("#7fcdbb", "#253494"))
+
+# Split dataset by lake
+Peter.tN.surface <- filter(PeterPaul.tN.surface, lakename == "Peter Lake")
+
+ggplot(Peter.tN.surface, aes(x = sampledate, y = tn_ug)) + 
+  geom_point(color = c("#253494")) +
+  xlab(expression("Date")) +
+  ylab(expression(paste("Total Nitrogen Concentration (\U003BCg/lt)"))) +
+  ggtitle("Peter Lake Total Nitrogen Concentration")
+
+Paul.tN.surface <- filter(PeterPaul.tN.surface, lakename == "Paul Lake")
+
+ggplot(Paul.tN.surface, aes(x = sampledate, y = tn_ug)) + 
+  geom_point(color = c("#7fcdbb")) +
+  xlab(expression("Date")) +
+  ylab(expression(paste("Total Nitrogen Concentration (\U003BCg/lt)"))) +
+  ggtitle("Paul Lake Total Nitrogen Concentration")
+
+# Run a Mann-Kendall test for Peter Lake
+mk.test(Peter.tN.surface$tn_ug)
+
+# There is a significant trend in total N surface concentrations in Peter 
+# lake (Mann-Kendall trend test, z = 7.2927, n = 98, p-value = 3.039e-13 < 0.05).
+
+# Run a Pettitt's Test for changepoints in the datasets. 
+
+pettitt.test(Peter.tN.surface$tn_ug)
+
+# There is a significant changepoint in total N surface concentrations in Peter lake. 
+# Probable change point at time K 36 = 06-02-1993 
+#(Pettitt's test, U* = 1884, p-value = 3.744e-10 < 0.05).
+
+# Run separate Mann-Kendall for each changepoint segment
+
+mk.test(Peter.tN.surface$tn_ug[1:35])
+
+# There is not a significant trend in total N surface concentrations in Peter 
+# lake between 05-20-1991 and 05-26-1993 
+# (Mann-Kendall trend test, z = -0.22722, n = 35, p-value = 0.8203 > 0.05).
+
+mk.test(Peter.tN.surface$tn_ug[36:98]) 
+
+# There is not a significant trend in total N surface concentrations in Peter 
+# lake between 06-02-1993 and 08-16-1999 
+# (Mann-Kendall trend test, z = 3.1909, n = 63, p-value = 0.001418 < 0.05).
+
+# Is there a second change point?
+pettitt.test(Peter.tN.surface$tn_ug[1:35])
+
+# There is not a significant changepoint in total N surface concentrations in Peter lake 
+# between 05-20-1991 and 05-26-1993. (Pettitt's test, U* = 72, p-value = 0.9879).
+
+pettitt.test(Peter.tN.surface$tn_ug[36:98]) 
+
+# There is a significant changepoint in total N surface concentrations in Peter 
+# lake between 06-02-1993 and 08-16-1999. Probable change point at time 
+# K 21 = 06-22-1994 (Pettitt's test, U* = 560, p-value = 0.001213 < 0.05).
+
+# Run another Mann-Kendall for the second change point
+mk.test(Peter.tN.surface$tn_ug[36:55])
+
+# There is not a significant trend in total N surface concentrations in Peter 
+# lake between 06-02-1993 and 06-15-1994 
+# (Mann-Kendall trend test, z = -1.2004, n = 20, p-value = 0.23 > 0.05).
+
+mk.test(Peter.tN.surface$tn_ug[56:98]) 
+
+# There is not a significant trend in total N surface concentrations in Peter 
+# lake between 06-22-1994 and 08-16-1999 
+# (Mann-Kendall trend test, z = 0.48141, n = 43, p-value = 0.6302 > 0.05).
+
+
+# Is there a third change point?
+pettitt.test(Peter.tN.surface$tn_ug[36:55])
+
+# There is not a significant changepoint in total N surface concentrations in Peter lake 
+# between 06-02-1993 and 06-15-1994. (Pettitt's test, U* = 42, p-value = 0.5673).
+
+pettitt.test(Peter.tN.surface$tn_ug[56:98]) 
+
+# There is not a significant changepoint in total N surface concentrations in Peter lake 
+# between 06-22-1994 and 08-16-1999. (Pettitt's test, U* = 42, p-value = 0.5673).
+
+# In Peter lake data visually it can be seen a decreasing trend after point 84 (1996-06-25), 
+# so we check for that.
+
+mk.test(Peter.tN.surface$tn_ug[56:84]) 
+# There is not a significant trend in total N surface concentrations in Peter lake between 06-22-1994 
+# and 06-25-1996 (Mann-Kendall trend test, z = 0.69405, n = 29, p-value = 0.4877 > 0.05).
+
+mk.test(Peter.tN.surface$tn_ug[84:98]) 
+# There is a significant trend in total N surface concentrations in Peter lake between 
+# 06-25-1996 and 08-16-1999 (Mann-Kendall trend test, z = -2.2764, n = 15, p-value = 0.02282 < 0.05).
+
+# Run a Mann-Kendall test for Paul Lake
+
+mk.test(Paul.tN.surface$tn_ug)
+
+# There is not a significant trend in total N surface concentrations in Paul 
+# lake (Mann-Kendall trend test, z = -0.1572, n = 99, p-value = 0.8751 > 0.05).
+
+# Run a Pettitt's Test for changepoints in the datasets. 
+
+pettitt.test(Paul.tN.surface$tn_ug)
+
+# There is not a significant changepoint in total N surface concentrations in Paul lake. 
+# (Pettitt's test, U* = 704, p-value = 0.09624 > 0.05).
+```
 
 What are the results of this test?
 
-> ANSWER: 
+> ANSWER: In Peter Lake, there is a significant increasing trend in total N surface concentrations between 05-20-1991 and 08-16-1999  (Mann-Kendall trend test, z = 7.2927, n = 98, p-value = 3.039e-13 < 0.05). There is also a significant changepoint in total N surface concentrations in Peter lake at time K 36 = 06-02-1993 (Pettitt's test, U = 1884, p-value = 3.744e-10 < 0.05), and a second one at time K 21 = 06-22-1994 (Pettitt's test, U = 560, p-value = 0.001213 < 0.05).
+
+> There is also a significant decreasing trend in total N surface concentrations between 06-25-1996 and 08-16-1999 (Mann-Kendall trend test, z = -2.2764, n = 15, p-value = 0.02282 < 0.05), which was identified visually.
+
+> In Paul Lake, there is not a significant trend in total N surface concentrations (Mann-Kendall trend test, z = -0.1572, n = 99, p-value = 0.8751 > 0.05).
 
 5. Generate a graph that illustrates the TN concentrations over time, coloring by lake and adding vertical line(s) representing changepoint(s).
 
 ```{r}
-
+ggplot(PeterPaul.tN.surface, aes(x = sampledate, y = tn_ug, color = lakename)) + 
+  geom_point() +
+  xlab(expression("Date")) +
+  ylab(expression(paste("Total Nitrogen Concentration (\U003BCg/lt)"))) +
+  ggtitle("Peter Paul Lakes Total Nitrogen Concentration") +
+  scale_color_manual(values = c("#7fcdbb", "#253494")) +
+  geom_vline(xintercept=as.Date("1993/06/02"), color= "#253494", lty=2) +
+  geom_vline(xintercept=as.Date("1994/06/22"), color= "#253494", lty=2)
 ```
 
