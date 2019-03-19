@@ -227,7 +227,7 @@ ANSWER: Yes
 \end{Shaded}
 
 \begin{verbatim}
-## -- Attaching packages ----------------------------------------- tidyverse 1.2.1 --
+## -- Attaching packages ------------------------------------------ tidyverse 1.2.1 --
 \end{verbatim}
 
 \begin{verbatim}
@@ -238,7 +238,7 @@ ANSWER: Yes
 \end{verbatim}
 
 \begin{verbatim}
-## -- Conflicts -------------------------------------------- tidyverse_conflicts() --
+## -- Conflicts --------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()
 \end{verbatim}
@@ -427,7 +427,7 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 \NormalTok{PM2.}\DecValTok{5}\NormalTok{ =}\StringTok{ }\NormalTok{PM2.}\DecValTok{5}\NormalTok{[}\OperatorTok{!}\KeywordTok{duplicated}\NormalTok{(PM2.}\DecValTok{5}\OperatorTok{$}\NormalTok{Date),]}
 
 \CommentTok{#3c.}
-\NormalTok{PM252018.auto <-}\StringTok{ }\KeywordTok{lme}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ EPA_raw_AQ_PM25_}\DecValTok{2018}\NormalTok{, Daily.Mean.PM2.}\FloatTok{5.}\NormalTok{Concentration }\OperatorTok{~}\StringTok{ }\NormalTok{Date, }
+\NormalTok{PM252018.auto <-}\StringTok{ }\KeywordTok{lme}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PM2.}\DecValTok{5}\NormalTok{, Daily.Mean.PM2.}\FloatTok{5.}\NormalTok{Concentration }\OperatorTok{~}\StringTok{ }\NormalTok{Date, }
                      \DataTypeTok{random =} \OperatorTok{~}\DecValTok{1}\OperatorTok{|}\NormalTok{Site.Name)}
 \NormalTok{PM252018.auto}
 \end{Highlighting}
@@ -435,19 +435,19 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 
 \begin{verbatim}
 ## Linear mixed-effects model fit by REML
-##   Data: EPA_raw_AQ_PM25_2018 
-##   Log-restricted-likelihood: -20297.38
+##   Data: PM2.5 
+##   Log-restricted-likelihood: -928.6076
 ##   Fixed: Daily.Mean.PM2.5.Concentration ~ Date 
-## (Intercept)        Date 
-## 20.14183588 -0.00074241 
+##  (Intercept)         Date 
+## 90.465022634 -0.004727976 
 ## 
 ## Random effects:
 ##  Formula: ~1 | Site.Name
 ##         (Intercept) Residual
-## StdDev:    1.841425 3.457061
+## StdDev:    1.650184 3.559209
 ## 
-## Number of Observations: 7611
-## Number of Groups: 24
+## Number of Observations: 343
+## Number of Groups: 3
 \end{verbatim}
 
 \begin{Shaded}
@@ -459,33 +459,31 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 \begin{verbatim}
 ##    lag          ACF
 ## 1    0  1.000000000
-## 2    1  0.473017989
-## 3    2  0.143093030
-## 4    3  0.060500838
-## 5    4  0.061574447
-## 6    5  0.087756109
-## 7    6  0.061116723
-## 8    7  0.007595491
-## 9    8  0.025491472
-## 10   9  0.057872193
-## 11  10  0.095911195
-## 12  11  0.086519308
-## 13  12  0.041507759
-## 14  13  0.041091743
-## 15  14  0.008663124
-## 16  15 -0.012810524
-## 17  16 -0.016388970
-## 18  17 -0.023436707
-## 19  18  0.020967717
-## 20  19  0.032373855
-## 21  20 -0.046770645
-## 22  21 -0.086974675
-## 23  22 -0.045009633
-## 24  23  0.014507171
-## 25  24  0.046279402
-## 26  25  0.021031653
-## 27  26 -0.017185250
-## 28  27  0.008158717
+## 2    1  0.513829909
+## 3    2  0.194512680
+## 4    3  0.117925187
+## 5    4  0.126462863
+## 6    5  0.100699787
+## 7    6  0.058215891
+## 8    7 -0.053090104
+## 9    8  0.017671857
+## 10   9  0.012177847
+## 11  10 -0.003699721
+## 12  11 -0.020305291
+## 13  12 -0.044621086
+## 14  13 -0.055602646
+## 15  14 -0.065787345
+## 16  15 -0.123987593
+## 17  16 -0.055414056
+## 18  17  0.002911218
+## 19  18  0.025133456
+## 20  19 -0.015306468
+## 21  20 -0.143472007
+## 22  21 -0.155495492
+## 23  22 -0.060369985
+## 24  23  0.003954231
+## 25  24  0.042295682
+## 26  25  0.001320007
 \end{verbatim}
 
 \begin{Shaded}
@@ -493,7 +491,7 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 \CommentTok{#3d.}
 \NormalTok{PM252018.mixed <-}\StringTok{ }\KeywordTok{lme}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PM2.}\DecValTok{5}\NormalTok{, Daily.Mean.PM2.}\FloatTok{5.}\NormalTok{Concentration }\OperatorTok{~}\StringTok{ }\NormalTok{Date, }
                      \DataTypeTok{random =} \OperatorTok{~}\DecValTok{1}\OperatorTok{|}\NormalTok{Site.Name,}
-                     \DataTypeTok{correlation =} \KeywordTok{corAR1}\NormalTok{(}\DataTypeTok{form =} \OperatorTok{~}\StringTok{ }\NormalTok{Date}\OperatorTok{|}\NormalTok{Site.Name, }\DataTypeTok{value =} \FloatTok{0.473017989}\NormalTok{),}
+                     \DataTypeTok{correlation =} \KeywordTok{corAR1}\NormalTok{(}\DataTypeTok{form =} \OperatorTok{~}\StringTok{ }\NormalTok{Date}\OperatorTok{|}\NormalTok{Site.Name, }\DataTypeTok{value =} \FloatTok{0.513829909}\NormalTok{),}
                      \DataTypeTok{method =} \StringTok{"REML"}\NormalTok{)}
 \KeywordTok{summary}\NormalTok{(PM252018.mixed)}
 \end{Highlighting}
@@ -507,8 +505,8 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 ## 
 ## Random effects:
 ##  Formula: ~1 | Site.Name
-##          (Intercept) Residual
-## StdDev: 0.0007705506 3.597269
+##         (Intercept) Residual
+## StdDev: 0.001025094 3.597269
 ## 
 ## Correlation Structure: ARMA(1,0)
 ##  Formula: ~Date | Site.Name 
@@ -517,7 +515,7 @@ PM2.5{[}!duplicated(PM2.5\$Date),{]}
 ## 0.5384349 
 ## Fixed effects: Daily.Mean.PM2.5.Concentration ~ Date 
 ##                Value Std.Error  DF   t-value p-value
-## (Intercept) 83.14801  60.63584 339  1.371268  0.1712
+## (Intercept) 83.14801  60.63585 339  1.371268  0.1712
 ## Date        -0.00426   0.00342 339 -1.244145  0.2143
 ##  Correlation: 
 ##      (Intr)

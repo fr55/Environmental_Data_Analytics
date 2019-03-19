@@ -109,7 +109,7 @@ PM2.5 = EPA_raw_AQ_PM25_2018[order(EPA_raw_AQ_PM25_2018[,'Date'],-EPA_raw_AQ_PM2
 PM2.5 = PM2.5[!duplicated(PM2.5$Date),]
 
 #3c.
-PM252018.auto <- lme(data = EPA_raw_AQ_PM25_2018, Daily.Mean.PM2.5.Concentration ~ Date, 
+PM252018.auto <- lme(data = PM2.5, Daily.Mean.PM2.5.Concentration ~ Date, 
                      random = ~1|Site.Name)
 PM252018.auto
 
@@ -118,7 +118,7 @@ ACF(PM252018.auto)
 #3d.
 PM252018.mixed <- lme(data = PM2.5, Daily.Mean.PM2.5.Concentration ~ Date, 
                      random = ~1|Site.Name,
-                     correlation = corAR1(form = ~ Date|Site.Name, value = 0.473017989),
+                     correlation = corAR1(form = ~ Date|Site.Name, value = 0.513829909),
                      method = "REML")
 summary(PM252018.mixed)
 
