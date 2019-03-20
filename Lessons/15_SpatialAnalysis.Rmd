@@ -32,7 +32,7 @@ In this lesson, we explore how data can be represented spatially, and how we can
 ## The vector (vs raster) data model
 Spatial data are modeled in two formats: vector and raster. Today, we'll be concentrating on vector data, returning to raster a bit later. With vector data, features are represented with a combination of three elements: **geometry**, **attributes**, and a **coordinate reference system**, or `crs`. Let's talk about the first two and then come back to the crs a bit later. 
 
-
+# FRA: 3 things:
 ### Feature _geometries_
 With vector data, a spatial feature takes the form of a _point_, _line_, or a _polygon_, collectively referred to as its **geometry**. 
 
@@ -58,25 +58,25 @@ library(tidyverse, quietly = TRUE)
 EPAair_PM25_NC2018_raw <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv")
 
 #Reduce our data to just one record for each location, computing mean and max daily AQI values
-EPAair_PM_avg <- EPAair_PM25_NC2018_raw %>% 
+EPAair_PM_avg <- EPAair_PM25_NC2018_raw %>% # FRA: to get togther the info of one point
   group_by(Site.Name, COUNTY, SITE_LATITUDE, SITE_LONGITUDE) %>% 
   summarize(meanPM = mean(Daily.Mean.PM2.5.Concentration),
             maxPM = max(Daily.Mean.PM2.5.Concentration))
 
 #Plot the data using longitude and latitude as X and Y
 ggplot(EPAair_PM_avg, aes(x=SITE_LONGITUDE, y=SITE_LATITUDE)) + 
-  geom_point(aes(color=meanPM), size=4) #+ coord_equal() 
+  geom_point(aes(color=meanPM), size=4) + coord_equal() # coord equal gives the same scale.
 ```
 
 This is more of a proof of concept than a useful map. We can sort of visualize spatial patterns in the data, but without context of scale or location, it's somewhat difficult. We can greatly improve this map with the help of some mapping packages for R...
 
-
+# FRA: mapping library
 ### Plotting with _Mapview_
 See https://rdrr.io/cran/mapview/man/mapviewOptions.html for more info.
 ```{r Plot EPA locations with `mapview`}
 #(Install and) Load the mapView package
 #install.packages('mapview')
-library(mapview)
+library(mapview) # FRA: good to see things on a map
 
 #Set the available map backgrounds
 mapviewOptions(basemaps = c('OpenStreetMap','Esri.WorldImagery','Stamen.Toner','Stamen.Watercolor'))
@@ -108,12 +108,12 @@ library(leaflet)
 
 #Create the map and add Tiles
 myMap  <- leaflet(data=EPAair_PM_avg) %>% 
-  addTiles() %>% 
+  addTiles() %>% # tiles are the background maps (there is also ggmaps)
   addCircleMarkers(~SITE_LONGITUDE,~SITE_LATITUDE,
                    radius=(~meanPM*2),
                    stroke = FALSE, 
                    fillOpacity = 0.3,
-                   popup = ~as.character(`Site.Name`))
+                   popup = ~as.character(`Site.Name`)) # RA: what field you want to pop up when you click the point
 #Show the map
 myMap
 ```
@@ -149,7 +149,7 @@ First, let's convert our EPA dataframe to a simple features ("sf") dataframe and
 library(sf)
 
 #Convert the dataset to a spatially enabled "sf" data frame
-EPAair_PM_avg_sf <- st_as_sf(EPAair_PM_avg,coords = c('SITE_LONGITUDE','SITE_LATITUDE'),crs=4326)
+EPAair_PM_avg_sf <- st_as_sf(EPAair_PM_avg,coords = c('SITE_LONGITUDE','SITE_LATITUDE'),crs=4326) # crs = coordinate reference system. later
 
 #Do you see a new column name?                
 colnames(EPAair_PM_avg_sf)
@@ -169,7 +169,7 @@ plot(EPAair_PM_avg_sf)
 #Plot everything -- with MapView
 mapview(EPAair_PM_avg_sf)
 
-#Plot a single variable in mapviwe
+#Plot a single variable in MapView
 mapview(EPAair_PM_avg_sf['meanPM'])
 
 #With geometries now available in a column, we can use ggplot with the geom_sf object
@@ -188,7 +188,7 @@ With our EPA data now spatially enabled, we can perform spatial analysis with th
 #Buffer the Durham Armory point 0.1 degrees
 Durham_buffer <- EPAair_PM_avg_sf %>% 
   filter(Site.Name == 'Durham Armory') %>% 
-  st_buffer(0.1)
+  st_buffer(0.1) # FRA: 0.1 degree. 
 
 #View the result
 mapView(Durham_buffer)
@@ -212,7 +212,7 @@ Projecting data involves a lot of math, but there are equations for that. Still,
 * Great video on projections: [link](https://www.youtube.com/watch?v=kIID5FDi2JQ)
 * Nice overview of coordinate systems  [link](https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/OverviewCoordinateReferenceSystems.pdf)
 * Some comic relief from xkcd! [link](https://xkcd.com/977/)
-* Visualizing all the different projections [link](https://map-projections.net/singleview.php)
+* Visualizing all the different projections [link](https://map-projections.net/singleview.php) #BUENO!!!
 
 The bottom line is that we have numerous different coordinate reference systems. We have *geographic coordinate systems (GCS)* in which coordinates remain in geographic (or angular) units, and *projected coordinate systems (PCS)* in which coordinates are in planar units. Both GCS and PCS require a defined *spheorid* and *datum* for depicting the shape of the earth. And PCS additionally require information on how the surface of this sphere is projected onto a plane and the location of the origin of the coordinate system. Which CRS to choose depends on the location and extent of your study, and whether is most important to maintain correct areas, shapes, distances, or directions. 
 
@@ -226,7 +226,7 @@ Some CRS, however, do not have an associated EPSG code, and for those, we can us
 
 ```{r Explore the CRS of our dataset}
 #Recall what the CRS is of our EPA dataset
-st_crs(EPAair_PM_avg_sf)
+st_crs(EPAair_PM_avg_sf) # FRA: EPSG:4326. Datum:WGS84
 ```
 
 Now look that EPSG up on http://spatialreference.org. 
@@ -241,14 +241,14 @@ Applying our knowledge of CRS, let's transform our EPA sites from its native geo
 
 ```{r Transform our data to UTM 17 and buffer it}
 #Transform the entire EPA dataset to the UTM Zone 17N crs
-EPAair_PM_avg_sf_UTM <- st_transform(EPAair_PM_avg_sf, crs=26917)
+EPAair_PM_avg_sf_UTM <- st_transform(EPAair_PM_avg_sf, crs=26917) # there is a web page to look the number crs (spatial reference search)
 
 #Rebuffer the Durham Armory site. Is it now circular? 
 DA_UTM_buffer <- EPAair_PM_avg_sf_UTM %>% 
   filter(Site.Name == 'Durham Armory') %>%     # Filter for the Durham Armory Site
   st_buffer(2000)                              # Buffer 2000 meters
 
-mapView(DA_UTM_buffer)                         # View the results
+mapView(DA_UTM_buffer)                         # View the results FRA: now a circle
 ```
 
 As we are now in a planar coordinate system, we can do some more spatial analysis... We'll examine one quick one - a distance analysis - as a quick preview, then more later after we add some other datasets...
@@ -264,7 +264,7 @@ EPAair_PM_avg_sf <- mutate(EPAair_PM_avg_sf,Dist2DA = Distances_to_DASite)
 
 #Plot to see that it worked: larger = further?
 ggplot() + 
-  geom_sf(data=EPAair_PM_avg_sf,aes(size=Dist2DA)) 
+  geom_sf(data=EPAair_PM_avg_sf,aes(size=Dist2DA)) # distance forma given site.
 ```
 
 
