@@ -254,7 +254,8 @@ depth?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#output telling us: irradiance = 486.818(signif) - 95.89*depth + error (high error, only explaining 30% of the response) R.squared penalises you if you use more explanatory variable}
+\CommentTok{#output telling us: irradiance = 486.818(signif) - 95.89*depth + error (high error, only explaining }
+\CommentTok{#30% of the response) R.squared penalises you if you use more explanatory variable}
 
 \CommentTok{# Correlation (R value. you know the directionality)}
 \KeywordTok{cor.test}\NormalTok{(PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{irradianceWater, PeterPaul.chem.nutrients}\OperatorTok{$}\NormalTok{depth)}
@@ -360,7 +361,9 @@ the irradiance values.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{PeterPaul.chem.nutrients <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(PeterPaul.chem.nutrients, irradianceWater }\OperatorTok{!=}\StringTok{ }\DecValTok{0}\NormalTok{)}
-\NormalTok{irradiance.regression2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, }\KeywordTok{log}\NormalTok{(irradianceWater) }\OperatorTok{~}\StringTok{ }\NormalTok{depth) }\CommentTok{# we remove the 0 to be able to log  transform. they are only 3 values. not so concerned on loosing the data. to few.}
+\NormalTok{irradiance.regression2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, }\KeywordTok{log}\NormalTok{(irradianceWater) }\OperatorTok{~}\StringTok{ }\NormalTok{depth) }
+\CommentTok{# we remove the 0 to be able to log  transform. they are only 3 values. not so concerned }
+\CommentTok{# on loosing the data. to few.}
 \KeywordTok{summary}\NormalTok{(irradiance.regression2) }\CommentTok{#log(irradiance) = 6.2 - 0.74(depth) + error. better r2}
 \end{Highlighting}
 \end{Shaded}
@@ -553,7 +556,8 @@ covariance among explanatory variables.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# why not to use too many variables. you will find meaning less correlations. think about your questions. Overparametrization of your model. Runing out of degrees of freedom.}
+\CommentTok{# why not to use too many variables. you will find meaning less correlations. }
+\CommentTok{# think about your questions. Overparametrization of your model. Runing out of degrees of freedom.}
 \end{Highlighting}
 \end{Shaded}
 
@@ -636,7 +640,8 @@ temperature, PAR, total N concentration, and phosphate concentration.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{TPmodel <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.naomit, tp_ug }\OperatorTok{~}\StringTok{ }\NormalTok{temperature_C }\OperatorTok{+}\StringTok{ }\NormalTok{tn_ug) }\CommentTok{# you run the best fit model on its own.}
+\NormalTok{TPmodel <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.naomit, tp_ug }\OperatorTok{~}\StringTok{ }\NormalTok{temperature_C }\OperatorTok{+}\StringTok{ }\NormalTok{tn_ug) }
+\CommentTok{# you run the best fit model on its own.}
 \KeywordTok{summary}\NormalTok{(TPmodel) }\CommentTok{#54% of the variance. better!}
 \end{Highlighting}
 \end{Shaded}
@@ -679,7 +684,7 @@ and lake.
 \begin{Highlighting}[]
 \CommentTok{# main effects}
 \NormalTok{TNancova.main <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, tn_ug }\OperatorTok{~}\StringTok{ }\NormalTok{lakename }\OperatorTok{+}\StringTok{ }\NormalTok{depth)}
-\KeywordTok{summary}\NormalTok{(TNancova.main) }\CommentTok{#TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7depth(not significant). very little variance.}
+\KeywordTok{summary}\NormalTok{(TNancova.main) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -708,9 +713,11 @@ and lake.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{#TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7depth(not significant). very little variance.}
+
 \CommentTok{# interaction effects}
 \NormalTok{TNancova.interaction <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ PeterPaul.chem.nutrients, tn_ug }\OperatorTok{~}\StringTok{ }\NormalTok{lakename }\OperatorTok{*}\StringTok{ }\NormalTok{depth)}
-\KeywordTok{summary}\NormalTok{(TNancova.interaction) }\CommentTok{# TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.}
+\KeywordTok{summary}\NormalTok{(TNancova.interaction) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -740,7 +747,10 @@ and lake.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{TNplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ tn_ug, }\DataTypeTok{color =}\NormalTok{ lakename)) }\OperatorTok{+}\StringTok{ }\CommentTok{#color in aes two lines + }
+\CommentTok{# TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.}
+
+\NormalTok{TNplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(PeterPaul.chem.nutrients, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ depth, }\DataTypeTok{y =}\NormalTok{ tn_ug, }\DataTypeTok{color =}\NormalTok{ lakename)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\CommentTok{#color in aes two lines + }
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }
 \StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{xlim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)}

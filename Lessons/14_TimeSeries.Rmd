@@ -86,7 +86,8 @@ mk.test(Peter.nutrients.surface$tp_ug)
 #Mann-Kendall trend test
 
 #data:  Peter.nutrients.surface$tp_ug                   
-#z = 4.3966, n = 132, p-value = 1.099e-05              Low pvalue. there is a trend over time. z positive. positive trend over time.
+#z = 4.3966, n = 132, p-value = 1.099e-05              
+#     Low pvalue. there is a trend over time. z positive. positive trend over time.
 #alternative hypothesis: true S is not equal to 0      No trend over time
 #sample estimates:
 #           S         varS          tau   
@@ -178,7 +179,8 @@ Tip: Check your dataset to see if there is an NA value in the first row. You may
 # Run a linear interpolation of the dataset to fill in gaps
 USGS.flow.data.interpolated <- approx(USGS.flow.data.trimmed$datetime,
                                       USGS.flow.data.trimmed$discharge.mean, 
-                                      method = "linear", n = 3630) # so you dont generate new points. I think this was to fill rows with NAs. It give us a list.
+                                      method = "linear", n = 3630) 
+# so you dont generate new points. I think this was to fill rows with NAs. It give us a list.
 
 # Turn the interpolated dataset into a proper dataframe
 USGS.flow.data.interpolated <- do.call(cbind.data.frame, USGS.flow.data.interpolated)
@@ -188,12 +190,14 @@ USGS.flow.data.interpolated$Date <- as.Date(USGS.flow.data.interpolated$Date,
 
 # Create a time series object FRA: we need this for the seasonal test.
 USGS.flow.data.timeseries <- ts(USGS.flow.data.interpolated$Discharge, 
-                                start = c(2009, 1) ,frequency = 12) #12 beacuse is monthly. you can out 365.
+                                start = c(2009, 1) ,frequency = 12) 
+#12 beacuse is monthly. you can out 365.
 
 # Run a Seasonal Mann-Kendall test
 USGS.smktest <- smk.test(USGS.flow.data.timeseries)
 USGS.smktest # overall trend. similar to the first test that we did. pvalue low, there is a trend.
-summary(USGS.smktest) #gives as each month. the trends each season. Season 11 biggest trend. No trend in season 5 for example
+summary(USGS.smktest) #gives as each month. the trends each season. Season 11 biggest trend. 
+# No trend in season 5 for example
 ```
 
 Interpreting results of the Seasonal Mann-Kendall Test: 

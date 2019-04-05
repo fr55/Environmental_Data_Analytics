@@ -61,7 +61,7 @@ library(RColorBrewer)
 #New ones
 #import.packages('raster')
 library(raster)
-#import.packages('FedData')  #<-- useful for extracting spatial data
+#install.packages('FedData')  #<-- useful for extracting spatial data
 library(FedData)
 ```
 

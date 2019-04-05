@@ -90,7 +90,8 @@ TempTest.auto <- lme(data = PeterPaul.summertemp,
                      temperature_C ~ sampledate * lakename, 
                      random = ~1|Week)
 TempTest.auto
-# what the variability is among the weeks. That is why it gives a StdDev. (the random effect). Fixed effects gives coef.
+# what the variability is among the weeks. That is why it gives a StdDev. (the random effect).
+# Fixed effects gives coef.
 
 summary(TempTest.auto) # esto lo puse yo
 
@@ -109,13 +110,16 @@ TempTest.mixed <- lme(data = PeterPaul.summertemp,
                      temperature_C ~ sampledate * lakename, 
                      random = ~1|Week,
                      #specify autocorrelation structure of order 1 (this is the 42.3%)
-                     #sampledate is duplicated in some cases, so need to split up by lake. FRA: This is only beacuse R doesnt like  that the sample were taken the same time.
-                     correlation = corAR1(form = ~ sampledate/lakename|Week, value = 0.423), # we put manually the 0.423
+                     #sampledate is duplicated in some cases, so need to split up by lake. 
+                     #FRA: This is only beacuse R doesnt like  that the sample were taken the same time.
+                     correlation = corAR1(form = ~ sampledate/lakename|Week, value = 0.423), 
+                     # we put manually the 0.423
                      #define method as restricted maximum likelihood
                      method = "REML")
 summary(TempTest.mixed)
 
-#Results: Random we got a stddev. Fixed effects: lakenamePeter Lake coef --> no diff between lakes. The interaction is also not significant.
+#Results: Random we got a stddev. Fixed effects: lakenamePeter Lake coef --> no diff between lakes. 
+# The interaction is also not significant.
 
 # Compare the random effects model with the fixed effects model
 TempTest.fixed <- gls(data = PeterPaul.summertemp,
@@ -124,7 +128,8 @@ TempTest.fixed <- gls(data = PeterPaul.summertemp,
 summary(TempTest.fixed)
 
 # little diff results but same conclusions
-# why did we wanto to use random effect? --> We now there is variability. why dont use that for our advantage.
+# why did we wanto to use random effect? --> We now there is variability. why dont use 
+# that for our advantage.
 
 anova(TempTest.mixed, TempTest.fixed)
 # The lower the AIC, the better.

@@ -1,5 +1,5 @@
 ---
-title: "11: Generalized Linear Models"
+title: "12: Generalized Linear Models"
 author: "Environmental Data Analytics | Kateri Salk"
 date: "Spring 2019"
 output: pdf_document
@@ -58,7 +58,8 @@ irradiance.regression <- lm(PeterPaul.chem.nutrients$irradianceWater ~ PeterPaul
 irradiance.regression <- lm(data = PeterPaul.chem.nutrients, irradianceWater ~ depth)
 summary(irradiance.regression)
 
-#output telling us: irradiance = 486.818(signif) - 95.89*depth + error (high error, only explaining 30% of the response) R.squared penalises you if you use more explanatory variable
+#output telling us: irradiance = 486.818(signif) - 95.89*depth + error (high error, only explaining 
+#30% of the response) R.squared penalises you if you use more explanatory variable
 
 # Correlation (R value. you know the directionality)
 cor.test(PeterPaul.chem.nutrients$irradianceWater, PeterPaul.chem.nutrients$depth)
@@ -98,7 +99,9 @@ Given the distribution of irradiance values, we don't have a linear relationship
 
 ```{r, fig.height = 3, fig.width = 4}
 PeterPaul.chem.nutrients <- filter(PeterPaul.chem.nutrients, irradianceWater != 0)
-irradiance.regression2 <- lm(data = PeterPaul.chem.nutrients, log(irradianceWater) ~ depth) # we remove the 0 to be able to log  transform. they are only 3 values. not so concerned on loosing the data. to few.
+irradiance.regression2 <- lm(data = PeterPaul.chem.nutrients, log(irradianceWater) ~ depth) 
+# we remove the 0 to be able to log  transform. they are only 3 values. not so concerned 
+# on loosing the data. to few.
 summary(irradiance.regression2) #log(irradiance) = 6.2 - 0.74(depth) + error. better r2
 plot(irradiance.regression2) # better plots. keep an eye on the edges.
 
@@ -159,7 +162,8 @@ PeterPaulnutrients <-
 PeterPaulCorr <- cor(PeterPaulnutrients)
 corrplot(PeterPaulCorr, method = "ellipse") # without ellipse it gives you circles
 corrplot.mixed(PeterPaulCorr, upper = "ellipse")
-# why not to use too many variables. you will find meaning less correlations. think about your questions. Overparametrization of your model. Runing out of degrees of freedom.
+# why not to use too many variables. you will find meaning less correlations. 
+# think about your questions. Overparametrization of your model. Runing out of degrees of freedom.
 ```
 ### AIC to select variables
 
@@ -172,7 +176,8 @@ PeterPaul.naomit <- na.omit(PeterPaul.chem.nutrients) #here we lose a lot of poi
 TPAIC <- lm(data = PeterPaul.naomit, tp_ug ~ depth + dissolvedOxygen + 
               temperature_C + tn_ug + po4)
 step(TPAIC) # the lower AIC value the better
-TPmodel <- lm(data = PeterPaul.naomit, tp_ug ~ temperature_C + tn_ug) # you run the best fit model on its own.
+TPmodel <- lm(data = PeterPaul.naomit, tp_ug ~ temperature_C + tn_ug) 
+# you run the best fit model on its own.
 summary(TPmodel) #54% of the variance. better!
 
 ```
@@ -185,13 +190,16 @@ Let's say we wanted to predict total nitrogen concentrations by depth and by lak
 ```{r, fig.height = 3, fig.width = 4}
 # main effects
 TNancova.main <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename + depth)
-summary(TNancova.main) #TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7depth(not significant). very little variance.
+summary(TNancova.main) 
+#TN = 353(paul lake depth 0) + 135.361(peter diff) -9.7depth(not significant). very little variance.
 
 # interaction effects
 TNancova.interaction <- lm(data = PeterPaul.chem.nutrients, tn_ug ~ lakename * depth)
-summary(TNancova.interaction) # TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.
+summary(TNancova.interaction) 
+# TN = 325 + 185(Peter) + 20(if paul)depth - 48(if peter)depth + error. Slightly more variance than the last one.
 
-TNplot <- ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = tn_ug, color = lakename)) + #color in aes two lines + 
+TNplot <- ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = tn_ug, color = lakename)) + 
+  #color in aes two lines + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE) +
   xlim(0, 10)
