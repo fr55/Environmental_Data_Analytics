@@ -16,35 +16,75 @@ editor_options:
 
 ## BASIC R MARKDOWN DOCUMENT STRUCTURE
 
-1. **YAML Header** surrounded by --- on top and bottom
+1. **YAML Header** surrounded by --- on top and bottom FRA: yust another ar markdown language
     + YAML templates include options for html, pdf, word, markdown, and interactive
     + More information on formatting the YAML header can be found in the cheat sheet
 2. **R Code Chunks** surrounded by ``` on top and bottom
     + Create using `Cmd/Ctrl` + `Alt` + `I`
     + Can be named {r name} to facilitate navigation and autoreferencing
     + Chunk options allow for flexibility when the code runs and when the document is knitted
+
 3. **Text** with formatting options for readability in knitted document
 
 A handy cheat sheet for R markdown can be found [here](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf). Another one can be found [here](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf).
 
 ## WHY R MARKDOWN?
 
-<Fill in our discussion below with bullet points. Use italics and bold for emphasis>
+<Fill in our discussion below with bullet points. Use italics and bold for emphasis FRA: this is a comment that does not print>
+
+- Create a bullet
++ Other way of ceatitng a bullet
+* Other way but tricky becuase if you dont put a space 
+- Code, output, and test/notes together in one document
+- Knit to useful formats (pdf, html, docx)
+- Legible code + output
+- Git friendly - version control!
+- Reproducible
+- Updating capabilities
+- Focus on output and conclusions, not code (flexible formatting)
+- Simple syntax and autoreferencing
 
 ## TEXT EDITING CHALLENGE
 
 Create a table below that details the example datasets we have been using in class. The first column should contain the name of the dataset and the second column should include some relevant information about the dataset.
+
+Dataset | Information
+------------------- | ------------------------------------
+ECOTOX Neonicotinoid | Contains data from studies on several neonicotinoids and their effects on mortality of various organisms.
+EPA Air Quality | Contains data from air quality monitoring of PM2.5 and ozone in North Carolina in 2017 and 2018. 
+NTL-LTER Lake | Contains data from studies on several lakes in the North Temperate Lakes District in Wisconsin, USA. Data were collected as part of the Long Term Ecological Research station established by the National Science Foundation.
+USGS Streamflow data for site 02085000 | Contains streamflow data from the USGS streamflow gage site 02085000 (Eno River at Hillsborough, NC).
 
 
 ## R CHUNK EDITING CHALLENGE
 ### Installing packages
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run). 
 
+```{r, eval=FALSE}
+install.packages('knitr')
+```
+
 
 ### Setup
 Create an R chunk below called "setup" that checks your working directory, loads the packages `tidyverse` and `knitr`, and sets a ggplot theme. 
+```{r setup}
+getwd()
+library(tidyverse)
+library(knitr)
+
+felipe_theme <- theme_light(base_size = 12) +
+  theme(axis.text = element_text(color = "grey8"), 
+        legend.position = "right", plot.title = element_text(hjust = 0.5)) 
+theme_set(felipe_theme)
+```
 
 Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, and set the date column to a date format.
+```{r include=FALSE}
+NTL_LTER_Lake_Nutrients_Raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv")
+head(NTL_LTER_Lake_Nutrients_Raw)
+
+NTL_LTER_Lake_Nutrients_Raw$sampledate <- as.Date(NTL_LTER_Lake_Nutrients_Raw$sampledate, format = "%m/%d/%y")
+```
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
 
@@ -55,11 +95,35 @@ Create an R chunk below to create a processed dataset do the following operation
 * Include all columns except lakeid, depth_id, and comments
 * Include only surface samples (depth = 0 m)
 
+```{r}
+NTL_LTER_Lake_Nutrients_Processed <- 
+  NTL_LTER_Lake_Nutrients_Raw %>%
+  select(lakename, year4, daynum, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+  filter(depth == 0) %>%
+  filter(!is.na(tn_ug)) %>%
+  filter(!is.na(tp_ug))
+```
+
 
 Create a second R chunk to create a summary dataset with the mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake. Create a second summary dataset that is identical except that it evaluates total phosphorus. Customize the chunk options such that the code is run but not displayed in the final document. 
 
+```{r include=FALSE}
+NTL_LTER_Lake_TN_Summary <- NTL_LTER_Lake_Nutrients_Processed %>%
+  group_by(lakename) %>% 
+  summarize(mean_tn_ug = mean(tn_ug), min_tn_ug = min(tn_ug), max_tn_ug = max(tn_ug),  sd_tn_ug = sd(tn_ug))
+
+NTL_LTER_Lake_TP_Summary <- NTL_LTER_Lake_Nutrients_Processed %>%
+  group_by(lakename) %>% 
+  summarize(mean_tp_ug = mean(tp_ug), min_tp_ug = min(tp_ug), max_tp_ug = max(tp_ug),  sd_tp_ug = sd(tp_ug))
+```
+
 
 Create a third R chunk that uses the function `kable` in the knitr package to display two tables: one for the summary dataframe for total N and one for the summary dataframe of total P. Use the `caption = " "` code within that function to title your tables. Customize the chunk options such that the final table is displayed but not the code used to generate the table. 
+
+```{r, echo=FALSE}
+kable(NTL_LTER_Lake_TN_Summary, caption = "Mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake")
+kable(NTL_LTER_Lake_TP_Summary, caption = "Mean, minimum, maximum, and standard deviation of total phosphorus concentrations for each lake")
+```
 
 
 Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
