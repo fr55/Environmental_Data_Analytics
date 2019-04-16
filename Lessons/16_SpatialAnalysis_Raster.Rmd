@@ -69,6 +69,9 @@ library(FedData)
 ```{r Import and transform HUC and County Data to a common CRS}
 #Read in the HUCs and save its CRS to a variable
 nc_hucs <- st_read('./Data/Spatial/huc_250k_nc.shp')
+
+mapview(nc_hucs)
+
 st_crs(nc_hucs)
 plot(nc_hucs['SUB'])
 
@@ -76,6 +79,7 @@ plot(nc_hucs['SUB'])
 tri_counties <- st_read('./Data/Spatial/cb_2017_us_county_20m.shp') %>% 
   filter(STATEFP == 37 & NAME %in% c('Durham', 'Orange', 'Chatham', 'Wake'))
 st_crs(tri_counties)
+mapview(tri_counties)
 
 #Transform the counties sf to match the hucs sf
 tri_counties <- st_transform(tri_counties,st_crs(nc_hucs))
@@ -84,6 +88,7 @@ st_crs(tri_counties)
 #Select the HUCs that intersect the counties
 hucMask <- st_intersects(nc_hucs,st_union(tri_counties),sparse = FALSE)
 tri_hucs <- nc_hucs[hucMask,]
+mapview(tri_hucs)
 
 #Plot the results
 ggplot() + 
@@ -110,9 +115,11 @@ nlcd2011 <- get_nlcd(template = tri_counties,             #Template specifies th
 
 #Plot the data
 plot(nlcd2011)
+mapview(nlcd2011)
+
 
 #Uncomment to remove all temporary tiles
-#unlink('./Data/Spatial/tmpNLCD',recursive = TRUE)
+unlink('./Data/Spatial/tmpNLCD',recursive = TRUE)
 ```
 ## IMPORTANT: These downloads may exceed your GitHub push limit. Before pushing, delete all intermediate data - nothing over 100MB!! 
 
@@ -125,6 +132,9 @@ dem30 <- get_ned(template = tri_counties,
                  label='tri',
                  raw.dir='./Data/Spatial',
                  extraction.dir = './Data/Spatial')
+
+mapview(dem30)
+
 ```
 
 ```{r Resample the 30m elevation data to 90 meters}
@@ -136,6 +146,7 @@ dem90 <- aggregate(dem30,fact=3,fun=mean,filename='./Data/Spatial/tri_NED_90.tif
 
 #Plot the data
 plot(dem90)
+plot(dem30)
 
 
 #Uncomment and run to delete the 30m tiles 

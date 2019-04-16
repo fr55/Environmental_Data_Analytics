@@ -1,6 +1,7 @@
 library(shiny)
 library(ggplot2)
-library(colourpicker)
+#install.packages('colourpicker')
+library(colourpicker) #that is how you get the bar to choose color.
 
 
 # ui
@@ -47,10 +48,14 @@ ui <- navbarPage('probability distributions', id = 'nav', # specifies panels at 
                               sliderInput('pn',
                                           'sample size'),
                               sliderInput('lambda',
-                                          '$$\\lambda$$'),
+                                          withMathJax('$$\\lambda$$'),
+                                          min = 0,
+                                          max = 10,
+                                          value = 5,
+                                          step = 0.1),
                               checkboxInput('phist', label = 'histogram', value = TRUE), 
                               checkboxInput('pdens', label = 'density', value = TRUE),
-                              colourInput('pcol', label = 'select a color')
+                              colourInput('pcol', label = 'select a color', value = '#FF6666')
                             ),
                             mainPanel(
                               tabsetPanel(position = 'below',
@@ -76,7 +81,10 @@ ui <- navbarPage('probability distributions', id = 'nav', # specifies panels at 
                                           max = 20,
                                           value = 10),
                               sliderInput('bprob',
-                                          'probability'),
+                                          'probability',
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.5)),
                               checkboxInput('bhist', label = 'histogram', value = TRUE), 
                               checkboxInput('bdens', label = 'density', value = TRUE),
                               colourInput('bcol', label = 'select a color', value = '#FF6666')
@@ -111,8 +119,8 @@ ui <- navbarPage('probability distributions', id = 'nav', # specifies panels at 
                                           max = 10,
                                           value = 1,
                                           step = 0.1),
-                              checkboxInput('ghist', label = 'histogram'), 
-                              checkboxInput('gdens', label = 'density'),
+                              checkboxInput('ghist', label = 'histogram', value = TRUE), 
+                              checkboxInput('gdens', label = 'density', value = TRUE),
                               colourInput('gcol', label = 'select a color', value = '#FF6666')
                             ),
                             mainPanel(

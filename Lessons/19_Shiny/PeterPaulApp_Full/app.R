@@ -1,5 +1,6 @@
 #### Load packages ----
 library(shiny)
+install.packages('shinythemes')
 library(shinythemes)
 library(tidyverse)
 
